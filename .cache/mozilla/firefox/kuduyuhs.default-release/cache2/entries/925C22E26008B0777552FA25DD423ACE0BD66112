@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="ad.size" content="width=160,height=600" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<title>US-90600_BREZTRI_DTC_Evergreen_Display_Ads_Batch_1_Banner8_160x600</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript" src="jquery.tinyscrollbar.min.js"></script>
+<script src="https://s0.2mdn.net/ads/studio/Enabler.js"> </script>
+<style>
+body{margin:0; padding:0; line-height:12px; font-size:10px; font-family:Arial; }
+*{-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;}
+img {border:none;}
+#blankdiv{width:158px; height:598px; position:absolute; top:0px; left:0px; background:rgba(255,255,255,0.00); cursor:pointer; }
+#wraper1{position:absolute; width:158px; height:598px; background:#FFFFFF; border:1px solid #000000; overflow:hidden;}
+#wraper{position:absolute; width:158px; height:598px; background:#373A36; border:1px solid #000000; overflow:hidden; display:none;}
+#bg{width: 160px; height: 46px; position: absolute; top: -48px; left: -1px; background: #FFFFFF;}
+#forTxt{position: absolute; top: 18px; left: 8px; font-family: 'Montserrat', sans-serif; font-size: 6px; font-weight: 700; color: #373A36; line-height: 7px; text-align: center;}
+#logo {background: url(logo.png) no-repeat; width: 146px; height:43px; position: absolute; top: 59px; left: 6px; background-size: contain;opacity: 0;}
+#haveTxt{position: absolute; top: 209px; left: 11px; font-family: 'Montserrat', sans-serif; font-size: 36px; font-weight: 800; color: #2CD5C4; line-height: 40px;text-align: center;}
+#breztriTxt{position: absolute; top: 135px; left: 2px; font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 400; color: #FFFFFF; line-height: 17px; letter-spacing: .1px; text-align: center;opacity: 0;}
+#withinTxt{position: absolute; top: 189px; left:2px; font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 800; color: #2CD5C4; letter-spacing: 0.15px;opacity: 0; line-height: 29px; text-align: center;}
+#resultsTxt{position: absolute; top: 339px; left: 8px; font-family: 'Montserrat', sans-serif; font-size: 6px; font-weight: 400; color: #FFFFFF;opacity: 0;}
+#footnote1{position: absolute; top: 351px; left:8px; font-family: 'Montserrat', sans-serif; font-size: 6px; font-weight: 700; color: #FFFFFF; line-height: 7px; opacity: 0;}
+#cta {position: absolute; top: 327px; left: 7px; background: url("cta.svg") no-repeat; width: 144px;height: 24px; background-size: contain;transform: scale(1);}
+
+#footnoteTxt{position: absolute; top: 571px; left: 8px; font-family: 'Montserrat', sans-serif; font-size: 6px; font-weight: 500; color: #FFFFFF; line-height: 16px;}
+	transform: rotate(0deg);
+	
+	-moz-transform:rotate(360deg);
+	-webkit-transform:rotate(360deg);
+	-o-transform:rotate(360deg);
+	-ms-transform:rotate(360deg);	
+animation: spin1 55s 1s 1 linear;
+	-webkit-animation: spin1 55s 1s 1 linear;}
+
+	@keyframes spin1{
+		0%{
+			-moz-transform:rotate(0deg);
+			-webkit-transform:rotate(0deg);
+			-o-transform:rotate(0deg);
+			-ms-transform:rotate(0deg);
+				
+		}
+		100%{
+			-moz-transform:rotate(360deg);
+			-webkit-transform:rotate(360deg);
+			-o-transform:rotate(360deg);
+			-ms-transform:rotate(360deg);
+		}
+	}	
+	@-webkit-keyframes spin1{
+		0%{
+			-moz-transform:rotate(0deg);
+			-webkit-transform:rotate(0deg);
+			-o-transform:rotate(0deg);
+			-ms-transform:rotate(0deg);
+				
+		}
+		100%{
+			-moz-transform:rotate(360deg);
+			-webkit-transform:rotate(360deg);
+			-o-transform:rotate(360deg);
+			-ms-transform:rotate(360deg);
+		}
+	}	
+#cta1 {position: absolute; top: 276px; left: 7px; background: url("cta.svg") no-repeat; width: 144px;height: 24px; background-size: contain;transform: scale(1); opacity: 0;}
+
+#bg1{width: 300px; height: 13px; position: absolute; top: 602px; left: -1px; background: #FFFFFF;}
+#pi_link{font-size: 6px; position: absolute; top: 0px; left: 10px; color: #000000; text-decoration: underline; font-family: 'Montserrat', sans-serif; cursor: pointer; font-weight: 700;}   
+#patient_link{position: absolute; top: 0px; left: 90px; color: #000000; text-decoration: underline; font-family: 'Montserrat', sans-serif; font-size: 6px; cursor: pointer; font-weight: 700;} 
+#footer_content_main{background:#ffffff;height: 198px;width:158px; position:absolute;left:0px;bottom:-205px;overflow:hidden;color:#373A36;}
+#scrollbar1 #viewport {width:132px;height: 164px;overflow:hidden;position:relative;top:33px;left:1px;}
+#scrollbar1 #overview {width:130px; list-style:none; position:absolute; left:0; top:0}
+#scrollbar1 #scrollbar{background:rgba(255,255,255,0.00);position: absolute;right:11px;top: 42px;width:7px;cursor:pointer;}
+#scrollbar1 #thumb {background:url(thumb.png) no-repeat;height:5px;width: 5px;cursor: pointer;overflow: hidden;position: absolute;top:0px;left: -1px;}
+#scrollbar1 #track {height:58px; width:2px; background:#373a36; cursor: pointer;  position: absolute; top:0px; left:2px;}
+.top_arrow {position: absolute; top: 38px; right: 11px; background: url(top_arrow.png) no-repeat; width: 7px; height: 6px; cursor: pointer;}
+.bottom_arrow{ position: absolute; bottom: 2px; right: 11px; background: url(bottom_arrow.png) no-repeat; width: 7px; height: 6px; cursor: pointer;}	
+#isiBg{background-color: #2CD5C4; position:absolute; top:0px; left:-1px; width:300px; height:28px;}
+.importantText{position:absolute;top: 2px;left:4px;font-size: 11px; color:#373A36; letter-spacing: .3px;}
+#exit1, #exit2, #exit2_1, #exit3, #exit3_1, #exit4, #exit4_1 { cursor:pointer;}
+#exit2_1, #exit3_1 , #exit4{ color:#227870;}
+p { margin:5px 0px 5px 4px; }
+.para_top {  margin:5px 0px 5px 4px; color:#000000; }
+sub{ position:relative; line-height:0px; top:0px; font-size: 7px;}
+sup{ position:relative; line-height:0px; }
+ul{  margin: 0px 0px 5px 10px; padding: 0px; counter-reset: li} 
+ul li{  list-style: none; line-height: 12px; text-indent:-10px; margin-top:5px; margin-left:3px;}
+ul li:before {content: '\2022'; position: relative; max-width: 0px; max-height: 0px; font-size: 17px; color: #F0B323; left: -2px; top: 3px; padding-right: 4px;}
+.scrollText{position: absolute; top: 28px; right: 4px; font-family: 'Montserrat', sans-serif; font-size: 6px; font-weight: 700; color: #000000; letter-spacing: 0px;}
+.innerLi li:before {content: '»'; top:-1px; padding-right: 3px; left:0px; font-size: 12px;}
+.innerLi{margin-left: 4px;}
+</style>
+</head>
+<body>
+<div id="wraper1"></div>
+<div id="wraper" onmousedown="return false" onmouseover="return false" onmousemove="return false">
+	<div id="logo"></div>
+	<div id="haveTxt">HAVE <br>COPD?</div>
+	<div id="footnoteTxt">COPD=chronic obstructive pulmonary disease.</div>
+	<div id="cta">
+	</div>
+	<div id="breztriTxt">BREZTRI can help improve lung function starting</div>
+	<div id="withinTxt">within 5 minutes*<sup style="font-size: 16px;">†</sup></div>
+	<div id="resultsTxt">*Results may vary.</div>
+	<div id="footnote1"><sup style="font-size: 4px;">†</sup>BREZTRI is not used to relieve sudden breathing problems and will not replace a rescue inhaler. BREZTRI is not for the treatment of asthma.</div>
+	<div id="cta1">
+  </div>
+<div id="exit1">
+	<div id="blankdiv"></div>
+ </div>
+ <div id="bg">
+	<div id="forTxt">For long-term treatment of COPD, better <br> breathing, symptom improvement, and fewer <br> flare-ups. Not a rescue inhaler. Not for asthma.</div>
+</div> 
+	
+<div id="bg1">
+ <div id="exit2">
+	 <div id="pi_link">Prescribing Information</div>
+ </div>
+ <div id="exit3">
+	 <div id="patient_link">Patient Information</div>
+ </div>
+</div>
+	<div id="footer_content_main">
+    <div id="isiBg"></div>
+    <div class="importantText"><b>IMPORTANT SAFETY INFORMATION</b></div>
+    <div id="scrollbar1">
+	<div class="top_arrow"></div>
+      <div id="scrollbar">
+        <div id="track">
+          <div id="thumb"></div>
+        </div>
+      </div>
+    <div class="scrollText">SCROLL</div>
+      <div id="viewport">
+        <div id="overview">
+           <ul>
+							
+			   <li style="margin-top: 0px;"><b>BREZTRI</b> combines <span style="display: inline-block;text-indent: 0px;">3 medicines,</span> an inhaled corticosteroid (ICS) medicine (budesonide), an anticholinergic medicine (glycopyrrolate), and a <span style="display: inline-block; text-indent:0;">long-acting</span> <span style="display: inline-block;text-indent: 0px;;">beta<sub>2</sub>-adrenergic</span> agonist (LABA) medicine (formoterol fumarate). LABA medicines, such as formoterol fumarate, when used alone can increase the risk of hospitalizations and death from asthma problems. When an ICS and LABA are used together, this risk is <b>not</b> significantly increased</li>
+							
+			   <li><b>Do not use BREZTRI</b> if you are allergic to budesonide, glycopyrrolate, formoterol fumarate, or any of the ingredients in BREZTRI</li>
+							
+			   <li><b>Do not take BREZTRI with other medicines that contain a <span style="display: inline-block; text-indent:0;">long-acting</span> <span style="display: inline-block;text-indent: 0px;;">beta<sub>2</sub>-adrenergic</span> agonist (LABA) or an anticholinergic for any reason.</b> Tell your healthcare provider about all your medical conditions and about all the medicines you take</li>
+			   <li>BREZTRI should be taken as 2 puffs, <span style="display: inline-block;text-indent: 0px;">2 times</span> each day. <b>Do not use BREZTRI more often than prescribed</b></li>
+			   <li><b>Call your healthcare provider or get medical care right away</b> if your breathing problems get worse, if you need to use your rescue inhaler more often than usual, or your rescue inhaler does not work as well to relieve your symptoms</li>
+								
+			   <li><b>BREZTRI can cause serious side effects, including:</b>
+			   <ul class="innerLi">
+				   
+				   <li><b>Fungal infection in your mouth or throat (thrush).</b> Rinse your mouth with water without swallowing after using BREZTRI to help reduce your chance of getting thrush</li>
+				   <li><b>Pneumonia.</b> People with COPD have a higher chance of getting pneumonia. Call your healthcare provider if you notice an increase in mucus (sputum) production or change in mucus color, fever, chills, increased cough, or increased breathing problems</li>
+				   <li><b>Weakened immune system and increased chance of getting infections (immunosuppression)</b></li>
+				   <li><b>Reduced adrenal function (adrenal insufficiency).</b> This can happen when you stop taking oral corticosteroid medicines and start inhaled corticosteroid medicine</li>
+				   <li><b>Sudden breathing problems immediately after inhaling BREZTRI.</b> If this happens, stop taking BREZTRI and call your healthcare provider right away</li>
+				   <li><b>Serious allergic reactions.</b> Call your healthcare provider or get emergency medical care if you get any of the following symptoms: rash; hives; swelling of your face, mouth, and tongue; or breathing problems</li>
+				   <li><b>Effects on your heart</b> such as increased blood pressure, a fast or irregular heartbeat, or chest pain</li>
+				   <li><b>Effects on your nervous system</b> such as tremor or nervousness</li>
+				   <li><b>Bone thinning or weakness (osteoporosis)</b></li>
+				   <li><b>Acute narrow-angle glaucoma and cataracts.</b> If you have new or worsening eye or vision problems, call your healthcare provider right away before taking another dose</li>
+				   <li><b>Urinary retention.</b> If you have new or worsening symptoms or difficulty urinating, stop taking BREZTRI and call your healthcare provider right away before taking another dose</li>
+				   <li><b>Changes in laboratory blood values,</b> including high levels of blood sugar (hyperglycemia) and low levels of potassium (hypokalemia). Low levels of potassium may cause symptoms of muscle spasm, muscle weakness, or abnormal heart rhythm</li>
+				   
+				</ul>
+			   </li>
+							
+			   <li><b>Most common side effects include:</b> upper respiratory tract infection, pneumonia, hoarseness, back pain, thrush in your mouth and throat, flu, muscle spasms, urinary tract infection, cough, inflammation of the sinuses, and diarrhea</li>
+							
+		       </ul>			
+				<p style="color:#373A36;"><b>APPROVED USE</b></p>
+						
+				<p>BREZTRI AEROSPHERE is a medicine used long term to treat chronic obstructive pulmonary disease (COPD), including chronic bronchitis, emphysema, or both, for better breathing and fewer flare-ups.</p>
+			    <p><b>BREZTRI is not used to relieve sudden breathing problems and will not replace a rescue inhaler. BREZTRI is not for the treatment of asthma.</b></p>
+						
+				<p><b>Please see full <span id="exit2_1"><u>Prescribing Information</u></span> and <span id="exit3_1"><u>Patient Information</u></span>, and discuss with your doctor.</b></p>
+				<p><b><i>You may <span id="exit4" style="color: #227870;"><u>report side effects related to AstraZeneca products</u></span>.<span id="exit4_1"><img src="icon1.svg" style="background-size: contain;margin-left: 1px;" width="8" height="8" alt="linkIcon"/></span></i></b></p>
+				<p>BREZTRI AEROSPHERE is a registered trademark of the AstraZeneca group of companies.</p>
+			
+                <p style="margin-bottom: 0px;">&copy;2024 AstraZeneca. <br> All rights reserved.</p>
+                <p style="margin-top: 0px;">US-90600 <br> Last Updated 9/24</p>
+        </div>
+      </div>
+      <div class="bottom_arrow"></div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.10.2/plugins/CSSPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.10.2/TweenMax.min.js"></script>
+<script src="https://cdn.flashtalking.com/frameworks/js/api/2/10/html5API.js"></script>
+<script src="https://cdn.flashtalking.com/frameworks/js/dlite/1/dlitetracker.js"></script>
+<script>
+function pageLoadedHandler() {
+	setTimeout(function(){$("#wraper1").css("display","none");},500);
+    $("#wraper").css("display","block");
+	TweenMax.to("#cta", 0.75, {delay:1, scale:1.07, repeat:Infinity, yoyo: true, ease: Power0.easeNone});
+	   TweenLite.to([haveTxt,cta],0.5,{delay:2.5, opacity:0});
+	    TweenLite.to([bg],0.5,{delay:3, top:0});
+	    TweenLite.to([forTxt],0.5,{delay:3, top:19});
+	    TweenLite.to([bg1],0.5,{delay:3, top:387});
+	    TweenMax.to([footer_content_main], 0.5, {delay:3, onUpdate:testId, bottom:0});
+	    TweenLite.to([logo],0.5,{delay:3.5, opacity:1});
+	    TweenLite.to([breztriTxt,withinTxt],0.5,{delay:4, opacity:1});
+	    TweenLite.to([resultsTxt,footnote1],0.5,{delay:4.5, opacity:1});
+		TweenLite.to([cta1],0.5,{delay:5, opacity:1});
+	    TweenMax.to("#cta1", 0.75, {delay:5, scale:1.07, repeat:Infinity, yoyo: true, ease: Power0.easeNone});
+    scrollTrap();
+
+		}
+function testId(){
+        $('#footer_content_main').tinyscrollbar();
+    }
+function scrollTrap(){
+	$('#footer_content_main').tinyscrollbar();	
+	var scrollTrackHeight=$("#track").height();
+	var scrollThumbCurrPos=0;var scrollThumbMaxPos=119;
+	var scrollThumbMinPos=0;
+	
+	$('.bottom_arrow').bind('click',function(){
+		scrollTrackHeight=$("#track").height();
+		
+		
+		scrollThumbCurrPos=parseFloat($("#thumb").css('top'));
+		var maxOverviewTop = $("#overview").height()-$("#viewport").height()+0; 
+		if(scrollTrackHeight>97){
+			scrollThumbMaxPos=533; 
+		}
+		else{
+			scrollThumbMaxPos=45;
+		}
+		scrollThumbCurrPos=scrollThumbCurrPos+5;
+		scrollThumbCurrPos = Math.min(scrollThumbCurrPos,scrollThumbMaxPos);
+				var currContentTop=$("#overview").position().top;
+				if(currContentTop<=0){
+					currContentTop=currContentTop-10;
+					currContentTop=currContentTop*(-1);
+				}
+				currContentTop = Math.min(currContentTop,maxOverviewTop);
+				if(currContentTop<4635)
+				$('#footer_content_main').tinyscrollbar_update(currContentTop);
+		
+	});
+	var scrollInterval=null;	
+				$('.bottom_arrow , .top_arrow').bind('mousedown',function(e){
+				
+				if($(e.target).hasClass("bottom_arrow"))
+				
+				scrollInterval=setInterval(function(){$('.bottom_arrow').trigger("click")},100);
+				else
+				scrollInterval=setInterval(function(){$('.top_arrow').trigger("click")},100);
+				});
+				
+				$('.bottom_arrow , .top_arrow').bind('mouseup mousemove',function(e){
+				
+				clearInterval(scrollInterval);
+				
+				});
+	$(".top_arrow").bind('click',function(){
+		scrollTrackHeight=$("#track").height();
+		scrollThumbCurrPos=$("#thumb").position().top;
+		scrollThumbCurrPos=scrollThumbCurrPos-5;
+		if(scrollThumbCurrPos<scrollThumbMinPos && $("#thumb").position().top>=scrollThumbMinPos)
+		scrollThumbCurrPos=$("#thumb").position().top;
+		if(scrollThumbCurrPos>=scrollThumbMinPos){
+			var currContentTop=$("#overview").position().top;
+			
+			if(currContentTop<0){
+					currContentTop=currContentTop+10;
+					currContentTop=currContentTop*(-1);
+					currContentTop = Math.max(currContentTop,0);
+			}
+			else
+			currContentTop = 0;
+			$("#footer_content_main").tinyscrollbar_update(currContentTop);
+		}
+	});
+}
+
+		var clickTag1 = 'https://www.breztri.com/about/what-makes-breztri-different';
+		var clickTag2 = 'https://den8dhaj6zs0e.cloudfront.net/50fd68b9-106b-4550-b5d0-12b045f8b184/9d44f9af-438a-448b-bb5c-dae506e17e49/9d44f9af-438a-448b-bb5c-dae506e17e49_viewable_rendition__v.pdf';
+		var clickTag3 = 'https://den8dhaj6zs0e.cloudfront.net/50fd68b9-106b-4550-b5d0-12b045f8b184/9d44f9af-438a-448b-bb5c-dae506e17e49/9d44f9af-438a-448b-bb5c-dae506e17e49_pi_med_guide_rendition__c.pdf';
+		var clickTag4 = 'https://us-aereporting.astrazeneca.com/adverse-events.html';
+		
+		//$("#exit1").bind("click", function (){Enabler.exit(clickTag1);window.open(clickTag1);}); 
+		//$("#exit2,#exit2_1").bind("click", function (){Enabler.exit(clickTag2);window.open(clickTag2);}); 
+		//$("#exit3,#exit3_1").bind("click", function (){Enabler.exit(clickTag3);window.open(clickTag3);}); 
+	   //$("#exit4,#exit4_1").bind("click", function (){Enabler.exit(clickTag4);window.open(clickTag4);}); 
+
+
+
+	  myFT.applyClickTag(exit1,1,clickTag1);
+         myFT.applyClickTag(exit2_1,2,clickTag2);
+         myFT.applyClickTag(exit2,2,clickTag2);
+        myFT.applyClickTag(exit3_1,3,clickTag3);
+        myFT.applyClickTag(exit3,3,clickTag3);
+        myFT.applyClickTag(exit4,4,clickTag4);
+        myFT.applyClickTag(exit4_1,4,clickTag4);
+	
+window.onload = function(){
+    if (Enabler.isPageLoaded()) {
+        pageLoadedHandler();
+    }
+    else {
+        Enabler.addEventListener(studio.events.StudioEvent.PAGE_LOADED,
+        pageLoadedHandler);
+    }
+}
+    </script>
+</body>
+</html>?Ql.f�      h0ћh0ћH80jh0�9   v    O^partitionKey=%28https%2Cyahoo.com%29,~FETCH,:https://cdn.flashtalking.com/190235/US-90600-banner8-160x600/index.html necko:classified 1 strongly-framed 1 security-info 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 request-method GET response-head HTTP/2 200 
+content-type: text/html
+last-modified: Wed, 13 Nov 2024 19:16:42 GMT
+server: Flashtalking (AKA)
+x-varnish: 322663946
+via: 1.1 prod-web-edge1.dub11.ftdns.net (Varnish/trunk), 1.1 dd80355363eac92e0372107558e579a8.cloudfront.net (CloudFront)
+accept-ranges: bytes
+date: Fri, 23 May 2025 19:37:45 GMT
+cache-control: max-age=1200
+etag: W/"1001a641ef4270ad0a4db50b7a7e966a"
+x-cache: Hit from cloudfront
+x-amz-cf-pop: JFK50-P4
+x-amz-cf-id: NnvplAlPcXx_QzXRTHQen911W05J4H6mRjYXZbZmz0T1HydxXfcyaw==
+vary: Origin
+X-Firefox-Spdy: h2
+ original-response-headers content-type: text/html
+last-modified: Wed, 13 Nov 2024 19:16:42 GMT
+server: Flashtalking (AKA)
+x-varnish: 322663946
+via: 1.1 prod-web-edge1.dub11.ftdns.net (Varnish/trunk), 1.1 dd80355363eac92e0372107558e579a8.cloudfront.net (CloudFront)
+accept-ranges: bytes
+date: Fri, 23 May 2025 19:37:45 GMT
+cache-control: max-age=1200
+etag: W/"1001a641ef4270ad0a4db50b7a7e966a"
+x-cache: Hit from cloudfront
+x-amz-cf-pop: JFK50-P4
+x-amz-cf-id: NnvplAlPcXx_QzXRTHQen911W05J4H6mRjYXZbZmz0T1HydxXfcyaw==
+vary: Origin
+X-Firefox-Spdy: h2
+ ctid 1 uncompressed-len 0 net-response-time-onstart 36 net-response-time-onstop 37   K-

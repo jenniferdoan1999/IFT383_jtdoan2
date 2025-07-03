@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xbel version="1.0"
+      xmlns:bookmark="http://www.freedesktop.org/standards/desktop-bookmarks"
+      xmlns:mime="http://www.freedesktop.org/standards/shared-mime-info"
+>
+  <bookmark href="file:///home/jenniferdoan/jennifer_doan_lab_b_ift_383.txt" added="2025-05-23T19:42:59.932539Z" modified="2025-05-30T18:30:51.908331Z" visited="2025-05-30T14:30:43.946971-04">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <bookmark:applications>
+          <bookmark:application name="gnome-text-editor" exec="&apos;gnome-text-editor %u&apos;" modified="2025-05-30T18:30:51.908330Z" count="17"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_01_jtdoan2.sh" added="2025-05-30T18:30:46.829244Z" modified="2025-07-03T20:37:51.897710Z" visited="2025-07-03T16:37:34.303233-04">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <bookmark:applications>
+          <bookmark:application name="gnome-text-editor" exec="&apos;gnome-text-editor %u&apos;" modified="2025-07-03T20:37:51.897709Z" count="11"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_g_task_02_jtdoan2.py" added="2025-06-21T19:46:22.216593Z" modified="2025-07-03T20:37:51.897711Z" visited="2025-07-03T16:37:34.417724-04">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <bookmark:applications>
+          <bookmark:application name="gnome-text-editor" exec="&apos;gnome-text-editor %u&apos;" modified="2025-07-03T20:37:51.897711Z" count="7"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+</xbel>

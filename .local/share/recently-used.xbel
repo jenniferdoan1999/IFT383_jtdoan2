@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xbel version="1.0"
+      xmlns:bookmark="http://www.freedesktop.org/standards/desktop-bookmarks"
+      xmlns:mime="http://www.freedesktop.org/standards/shared-mime-info"
+>
+  <bookmark href="file:///home/jenniferdoan/jennifer_doan_lab_b_ift_383.txt" added="2025-05-23T19:42:56.822880Z" modified="2025-05-23T19:48:52.884268Z" visited="2025-05-23T19:42:56.822881Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/plain"/>
+        <bookmark:applications>
+          <bookmark:application name="org.gnome.Nautilus" exec="&apos;gnome-text-editor %U&apos;" modified="2025-05-23T19:46:32.917520Z" count="3"/>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-23T19:48:52.884265Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_c_01.txt" added="2025-05-30T17:19:20.861885Z" modified="2025-05-30T17:19:20.861888Z" visited="2025-05-30T17:19:20.861886Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/plain"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-30T17:19:20.861886Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_c_02.csv" added="2025-05-30T17:19:23.364830Z" modified="2025-05-30T17:19:23.364832Z" visited="2025-05-30T17:19:23.364830Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/csv"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-30T17:19:23.364831Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_c_03.csv" added="2025-05-30T17:19:25.367922Z" modified="2025-05-30T17:19:25.367925Z" visited="2025-05-30T17:19:25.367923Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/csv"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-30T17:19:25.367924Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_c_04.txt" added="2025-05-30T17:19:26.888019Z" modified="2025-05-30T17:19:26.888021Z" visited="2025-05-30T17:19:26.888020Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/plain"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-30T17:19:26.888020Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_c_08.txt" added="2025-05-30T17:19:28.179141Z" modified="2025-05-30T17:19:28.179144Z" visited="2025-05-30T17:19:28.179141Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/plain"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-30T17:19:28.179143Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_c_09.txt" added="2025-05-30T17:19:29.591174Z" modified="2025-05-30T17:19:29.591177Z" visited="2025-05-30T17:19:29.591175Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/plain"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-30T17:19:29.591175Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_c_10.txt" added="2025-05-30T17:19:31.005773Z" modified="2025-05-30T17:19:31.005775Z" visited="2025-05-30T17:19:31.005774Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/plain"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-05-30T17:19:31.005774Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_01_jtdoan2.sh" added="2025-05-30T18:30:43.059260Z" modified="2025-06-01T03:15:11.136595Z" visited="2025-05-30T18:30:43.059261Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="org.gnome.Nautilus" exec="&apos;gnome-text-editor %U&apos;" modified="2025-05-30T18:30:43.059262Z" count="1"/>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:11.136593Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_02_jtdoan2.sh" added="2025-06-01T03:15:17.114613Z" modified="2025-06-01T03:15:17.114616Z" visited="2025-06-01T03:15:17.114614Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:17.114615Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_03_jtdoan2.sh" added="2025-06-01T03:15:22.890657Z" modified="2025-06-01T03:15:22.890659Z" visited="2025-06-01T03:15:22.890658Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:22.890659Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_04_jtdoan2.sh" added="2025-06-01T03:15:29.220478Z" modified="2025-06-01T03:15:29.220480Z" visited="2025-06-01T03:15:29.220478Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:29.220479Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_05_jtdoan2.sh" added="2025-06-01T03:15:36.582587Z" modified="2025-06-01T03:15:36.582589Z" visited="2025-06-01T03:15:36.582588Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:36.582588Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_06_jtdoan2.sh" added="2025-06-01T03:15:41.464593Z" modified="2025-06-01T03:15:41.464595Z" visited="2025-06-01T03:15:41.464593Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:41.464594Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_07_jtdoan2.sh" added="2025-06-01T03:15:45.954618Z" modified="2025-06-01T03:15:45.954620Z" visited="2025-06-01T03:15:45.954618Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:45.954619Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_08_jtdoan2.sh" added="2025-06-01T03:15:50.770596Z" modified="2025-06-01T03:15:50.770598Z" visited="2025-06-01T03:15:50.770596Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:50.770597Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_09_jtdoan2.sh" added="2025-06-01T03:15:55.271580Z" modified="2025-06-01T03:15:55.271582Z" visited="2025-06-01T03:15:55.271581Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:55.271581Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_c_task_10_jtdoan2.sh" added="2025-06-01T03:15:59.845928Z" modified="2025-06-01T03:15:59.845930Z" visited="2025-06-01T03:15:59.845928Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-01T03:15:59.845929Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_d_01.csv" added="2025-06-08T18:28:54.145102Z" modified="2025-06-08T18:28:54.145104Z" visited="2025-06-08T18:28:54.145102Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/csv"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T18:28:54.145103Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_d_05.csv" added="2025-06-08T18:28:57.485738Z" modified="2025-06-08T18:28:57.485741Z" visited="2025-06-08T18:28:57.485739Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/csv"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T18:28:57.485740Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/Downloads/lab_d_06.csv" added="2025-06-08T18:29:00.891046Z" modified="2025-06-08T18:29:00.891048Z" visited="2025-06-08T18:29:00.891047Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/csv"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T18:29:00.891047Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_d_task_01_jtdoan2.awk" added="2025-06-08T23:12:50.683841Z" modified="2025-06-08T23:12:50.683844Z" visited="2025-06-08T23:12:50.683841Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-awk"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T23:12:50.683842Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_d_task_02_jtdoan2.awk" added="2025-06-08T23:12:56.809915Z" modified="2025-06-08T23:12:56.809918Z" visited="2025-06-08T23:12:56.809916Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-awk"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T23:12:56.809916Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_d_task_03_jtdoan2.awk" added="2025-06-08T23:13:02.176270Z" modified="2025-06-08T23:13:02.176272Z" visited="2025-06-08T23:13:02.176270Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-awk"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T23:13:02.176271Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_d_task_04_jtdoan2.awk" added="2025-06-08T23:13:11.615723Z" modified="2025-06-08T23:13:11.615726Z" visited="2025-06-08T23:13:11.615723Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-awk"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T23:13:11.615724Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_d_task_05_jtdoan2.awk" added="2025-06-08T23:13:16.667229Z" modified="2025-06-08T23:13:16.667231Z" visited="2025-06-08T23:13:16.667229Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-awk"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T23:13:16.667230Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_d_task_06_jtdoan2.awk" added="2025-06-08T23:13:21.501003Z" modified="2025-06-08T23:13:21.501006Z" visited="2025-06-08T23:13:21.501004Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-awk"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T23:13:21.501004Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_d_task_07_jtdoan2.awk" added="2025-06-08T23:13:25.944066Z" modified="2025-06-08T23:13:25.944069Z" visited="2025-06-08T23:13:25.944067Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-awk"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-08T23:13:25.944068Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_e_task_01_jtdoan2.sh" added="2025-06-14T02:25:07.268573Z" modified="2025-06-14T02:25:07.268575Z" visited="2025-06-14T02:25:07.268573Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T02:25:07.268574Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_e_task_02_jtdoan2.sh" added="2025-06-14T02:25:13.178030Z" modified="2025-06-14T02:25:13.178032Z" visited="2025-06-14T02:25:13.178031Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T02:25:13.178031Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_e_task_03_jtdoan2.sh" added="2025-06-14T02:25:21.608072Z" modified="2025-06-14T02:25:21.608074Z" visited="2025-06-14T02:25:21.608072Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T02:25:21.608073Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_e_task_04_jtdoan2.sh" added="2025-06-14T02:25:27.258044Z" modified="2025-06-14T02:25:27.258046Z" visited="2025-06-14T02:25:27.258044Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T02:25:27.258045Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_e_task_05_jtdoan2.sh" added="2025-06-14T02:25:33.240340Z" modified="2025-06-14T02:25:33.240342Z" visited="2025-06-14T02:25:33.240340Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T02:25:33.240341Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_e_task_06_jtdoan2.sh" added="2025-06-14T02:25:38.162114Z" modified="2025-06-14T02:25:38.162117Z" visited="2025-06-14T02:25:38.162114Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T02:25:38.162115Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_e_task_07_jtdoan2.sh" added="2025-06-14T02:25:42.875358Z" modified="2025-06-14T02:25:42.875360Z" visited="2025-06-14T02:25:42.875359Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T02:25:42.875359Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_f_task_01_jtdoan2.sh" added="2025-06-14T21:45:44.492180Z" modified="2025-06-14T21:45:44.492183Z" visited="2025-06-14T21:45:44.492180Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T21:45:44.492181Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_f_task_02_jtdoan2.sh" added="2025-06-14T21:45:50.718668Z" modified="2025-06-14T21:45:50.718671Z" visited="2025-06-14T21:45:50.718668Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T21:45:50.718669Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_f_task_03_jtdoan2.sh" added="2025-06-14T21:45:55.680396Z" modified="2025-06-14T21:45:55.680400Z" visited="2025-06-14T21:45:55.680397Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T21:45:55.680397Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_f_task_04_jtdoan2.sh" added="2025-06-14T21:46:00.762371Z" modified="2025-06-14T21:46:00.762374Z" visited="2025-06-14T21:46:00.762372Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="application/x-shellscript"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-14T21:46:00.762373Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_g_task_02_jtdoan2.p%5EC%5EC%5EC%5EC" added="2025-06-21T19:46:08.738487Z" modified="2025-06-21T19:46:08.738490Z" visited="2025-06-21T19:46:08.738488Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python3"/>
+        <bookmark:applications>
+          <bookmark:application name="org.gnome.Nautilus" exec="&apos;gnome-text-editor %U&apos;" modified="2025-06-21T19:46:08.738488Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_g_task_02_jtdoan2.py" added="2025-06-21T19:46:19.346244Z" modified="2025-06-21T21:04:51.926190Z" visited="2025-06-21T19:46:19.346245Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="org.gnome.Nautilus" exec="&apos;gnome-text-editor %U&apos;" modified="2025-06-21T19:46:19.346246Z" count="1"/>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-21T21:04:51.926189Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_g_task_01_jtdoan2.py" added="2025-06-21T21:04:46.247190Z" modified="2025-06-21T21:04:46.247193Z" visited="2025-06-21T21:04:46.247191Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-21T21:04:46.247192Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_g_task_03_jtdoan2.py" added="2025-06-21T21:04:56.997186Z" modified="2025-06-21T21:04:56.997188Z" visited="2025-06-21T21:04:56.997186Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-21T21:04:56.997187Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_g_task_04_jtdoan2.py" added="2025-06-21T21:05:01.354085Z" modified="2025-06-21T21:05:01.354087Z" visited="2025-06-21T21:05:01.354085Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-21T21:05:01.354086Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_g_task_05_jtdoan2.py" added="2025-06-21T21:05:06.602955Z" modified="2025-06-21T21:05:06.602957Z" visited="2025-06-21T21:05:06.602955Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-21T21:05:06.602956Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_h_task_01_module_jtdoan2.py" added="2025-06-29T02:40:36.897359Z" modified="2025-06-29T02:40:36.897362Z" visited="2025-06-29T02:40:36.897359Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-29T02:40:36.897360Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_h_task_01_script_jtdoan2.py" added="2025-06-29T02:40:45.756756Z" modified="2025-06-29T02:40:45.756758Z" visited="2025-06-29T02:40:45.756757Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-29T02:40:45.756757Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_h_task_02_jtdoan2.py" added="2025-06-29T02:40:53.378463Z" modified="2025-06-29T02:40:53.378465Z" visited="2025-06-29T02:40:53.378463Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-29T02:40:53.378464Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/jenniferdoan/lab_h_task_03_jtdoan2.py" added="2025-06-29T02:41:02.207327Z" modified="2025-06-29T02:41:02.207329Z" visited="2025-06-29T02:41:02.207327Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <mime:mime-type type="text/x-python"/>
+        <bookmark:applications>
+          <bookmark:application name="Firefox" exec="&apos;org.mozilla.firefox %u&apos;" modified="2025-06-29T02:41:02.207328Z" count="1"/>
+        </bookmark:applications>
+      </metadata>
+    </info>
+  </bookmark>
+</xbel>

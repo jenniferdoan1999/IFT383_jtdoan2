@@ -1,0 +1,2457 @@
+/* eslint-disable no-use-before-define */
+/* global $, ENV, asu_ga */
+
+// TEST-BETA-PROD ONLY- Do not copy to DEV
+const auSubAccountIds = [184, 186, 187, 188, 189, 190, 191, 192, 193, 194];
+// END TEST-BETA-PROD ONLY
+
+// PROD ONLY - Do not copy to DEV, TEST, BETA
+// GA snippet
+function asuGA(i, s, o, g, r, a, m) {
+  // eslint-disable-next-line no-param-reassign
+  i.GoogleAnalyticsObject = r;
+  // eslint-disable-next-line no-param-reassign, no-unused-expressions
+  (i[r] =
+    i[r] ||
+    // eslint-disable-next-line func-names
+    function () {
+      // eslint-disable-next-line prefer-rest-params, no-param-reassign
+      (i[r].q = i[r].q || []).push(arguments);
+      // eslint-disable-next-line no-sequences
+    }),
+    // eslint-disable-next-line no-param-reassign
+    (i[r].l = 1 * new Date());
+  // eslint-disable-next-line no-unused-expressions, prefer-destructuring, no-sequences, no-param-reassign
+  (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+  // eslint-disable-next-line no-param-reassign
+  a.async = 1;
+  // eslint-disable-next-line no-param-reassign
+  a.src = g;
+  m.parentNode.insertBefore(a, m);
+}
+
+// <!-- Google Tag Manager -->
+((w, d, s, l, i) => {
+  // eslint-disable-next-line no-param-reassign
+  w[l] = w[l] || [];
+  w[l].push({
+    'gtm.start': new Date().getTime(),
+    event: 'gtm.js',
+  });
+  const f = d.getElementsByTagName(s)[0];
+  const j = d.createElement(s);
+  const dl = l !== 'dataLayer' ? `&l=${l}` : '';
+  j.async = true;
+  j.src = `https://www.googletagmanager.com/gtm.js?id=${i}${dl}`;
+  f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'dataLayer', 'GTM-PQVJ7SL');
+// <!-- End Google Tag Manager -->
+
+window.ALLY_CFG = {
+  baseUrl: 'https://prod.ally.ac',
+  clientId: 5430,
+};
+
+// eslint-disable-next-line no-undef
+$.getScript(`${ALLY_CFG.baseUrl}/integration/canvas/ally.js`);
+// END PROD ONLY - Do not copy to DEV, TEST, BETA
+
+let asuInactiveHidden;
+
+function setCookie(cName, cValue, expireInDays) {
+  const d = new Date();
+  d.setTime(d.getTime() + expireInDays * 24 * 60 * 60 * 1000);
+  const expires = `expires=${d.toUTCString()}`;
+  document.cookie = `${cName}=${cValue};${expires}; path=/`;
+}
+
+function getCookie(cName) {
+  const name = `${cName}=`;
+  const ca = document.cookie.split(';');
+  let i;
+  let c;
+  for (i = 0; i < ca.length; i++) {
+    c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return '';
+}
+
+function asuParseUrlForIdUrlSearchTerm(targetUrl, searchTerm) {
+  let start;
+  let end;
+  if (targetUrl.indexOf(searchTerm) !== -1) {
+    start = targetUrl.indexOf(searchTerm) + searchTerm.length + 1;
+    end = targetUrl.indexOf('/', start + 1);
+    if (end === -1) {
+      // If there is no next slash, the object's Id goes to the end of the string
+      end = targetUrl.length;
+    }
+    return targetUrl.substring(start, end);
+  }
+  return null;
+}
+
+// Usage: first time paginateAPI( url, processCallback, endingCallback )
+// second time paginateAPI( "", processCallback, endingCallback, count, requestObject )
+function paginateAPI(
+  targetURL = '',
+  processCallback,
+  endingCallback = '',
+  count = 0,
+  requestObject
+) {
+  if (targetURL !== '') {
+    $.ajax({
+      url: targetURL,
+      type: 'GET',
+    }).done((data, status, request) => {
+      const newCount = data.length;
+      processCallback(data, newCount);
+      paginateAPI('', processCallback, endingCallback, data.length, request);
+    });
+  } else if (requestObject.getResponseHeader('link').indexOf('next') > 0) {
+    const linkArray = requestObject.getResponseHeader('link').split(',');
+    linkArray.forEach((link) => {
+      if (link.indexOf('next') > 0) {
+        const nextUrl = link.substring(
+          link.indexOf('<') + 1,
+          link.indexOf('>')
+        );
+        $.ajax({
+          url: nextUrl,
+          type: 'GET',
+        }).done((data, status, innerRequest) => {
+          const newCount = count + data.length;
+          processCallback(data, newCount);
+          paginateAPI(
+            '',
+            processCallback,
+            endingCallback,
+            newCount,
+            innerRequest
+          );
+        });
+      }
+    });
+  } else if (endingCallback !== '') {
+    endingCallback(count);
+  }
+}
+
+// The following code can be used to identify when user content has finished loading into Canvas.
+// Similar code is used as part of USU design tools (designtools.usu.edu) hence the 2 at the end of the functions
+// You are free to use this however you would like - Kenneth Larsen, Utah State University
+// If any of these elements exist, we will watch for page content in them to load
+const klContentWrappersArray2 = [
+  '#course_home_content', // Course Front Page
+  '#wiki_page_show', // Content page
+  '#discussion_topic', // Discussions page
+  '#course_syllabus', // Syllabus page
+  '#assignment_show', // Assignments page
+  '#wiki_page_revisions',
+  '#people-options', // People page
+  '#gradebook_wrapper', // Gradebook (instructor)
+];
+
+// Check to see if the page content has loaded yet
+function klPageContentCheck2(klContentWrapperElement2, checkCount) {
+  let contentLoaded = false;
+  // Content Pages
+  if (
+    $('.show-content').length > 0 &&
+    $('.show-content').children().length > 0
+  ) {
+    contentLoaded = true;
+    // Discussions
+  } else if (
+    $('#discussion_topic').length > 0 &&
+    $('.user_content').text().length > 0
+  ) {
+    contentLoaded = true;
+    // Assignment (Teacher View)
+  } else if ($('#assignment_show .teacher-version').length > 0) {
+    contentLoaded = true;
+  } else if ($('#assignment_show .student-version').length > 0) {
+    contentLoaded = true;
+  } else if ($('#course_syllabus').length > 0) {
+    contentLoaded = true;
+  } else if (
+    $('div[data-view="users"]').length > 0 &&
+    document.querySelector('tbody.collectionViewItems') !== null
+  ) {
+    // people page
+    contentLoaded = true;
+  } else if (
+    $("#gradebook-grid-wrapper div[id*='assignment_'].assignment button")
+      .length > 0
+  ) {
+    // gradebook
+    contentLoaded = true;
+  }
+
+  if (contentLoaded) {
+    console.log('Content has loaded');
+    klAfterContentLoaded2();
+  } else if (checkCount < 50) {
+    const newCheckCount = checkCount + 1;
+    setTimeout(() => {
+      console.log(
+        `Still no content, check again (${klContentWrapperElement2})`
+      );
+      klPageContentCheck2(klContentWrapperElement2, newCheckCount);
+    }, 100);
+  }
+}
+
+function klAfterContentLoaded2() {
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Community%20of%20Care%3A%20Coming%20to%20Campus']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Community%20of%20Care%3A%20Coming%20to%20Campus&name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Devils%204%20Devils%3A%20Creating%20a%20Safe%20and%20Caring%20Community']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Devils%204%20Devils%3A%20Creating%20a%20Safe%20and%20Caring%20Community&name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate-sustainability/certificate.html']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate-sustainability/certificate.html#name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Free%20Speech%20at%20ASU']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Free%20Speech%20at%20ASU&name=${ENV.current_user.display_name}`
+  );
+
+  // Check if we're on the People page
+  if (
+    document.querySelector('tbody.collectionViewItems') !== null &&
+    window.location.toString().indexOf('users') > 0
+  ) {
+    asuInactivePeoplePage();
+    asuAddAlertForManualAdds();
+  }
+}
+
+function asuInactivePeoplePage() {
+  // Check if an "asuInactiveHidden" cookie exists, if not set it to false (visible)
+  asuCheckInactiveCookie();
+
+  // Create a mutationObserver that will hide inactive users when the roster list changes (if that is the current user's preference)
+  const mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach(() => {
+      // console.log(mutation);
+      // If inactive users should be hidden, hide them
+      if (asuInactiveHidden) {
+        asuToggleInactiveUsers();
+      }
+    });
+
+    // Add click event to deactivateUser to catch new rows added to the table
+    let i;
+    for (
+      i = 0;
+      i <
+      $("td.right div.admin-links ul li a[data-event='deactivateUser']").length;
+      i++
+    ) {
+      // Check if we've set a custom attribute on the link to store its state
+      if (
+        !$("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+          i
+        ].getAttribute('hasASUClickEvent')
+      ) {
+        // If not, then add the attribute and the event listener
+        $("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+          i
+        ].setAttribute('hasASUClickEvent', true);
+        $("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+          i
+        ].addEventListener('click', () => {
+          asuCheckForNewlyDeactivatedUsers(0);
+        });
+        console.log(
+          `adding event to ${
+            $("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+              i
+            ].parentElement.parentElement.parentElement.parentElement
+              .parentElement.id
+          }`
+        );
+      }
+    }
+  });
+
+  const tableBody = document.querySelector('tbody.collectionViewItems');
+
+  const config = { attributes: true, childList: true, characterData: true };
+
+  mutationObserver.observe(tableBody, config);
+
+  asuInjectHideShowButtonSelectorPosition(
+    "a[aria-label='Add People']",
+    'before'
+  );
+  asuToggleInactiveUsers();
+  asuFixAlternatingRowStyling();
+  asuAttachInactiveClickHandler();
+
+  $("td.right div.admin-links ul li a[data-event='deactivateUser']").click(
+    () => {
+      asuCheckForNewlyDeactivatedUsers(0);
+    }
+  );
+}
+
+function asuCheckInactiveCookie() {
+  asuInactiveHidden = getCookie('asuInactiveHidden');
+  if (asuInactiveHidden === '') {
+    // Default to false
+    asuInactiveHidden = false;
+    setCookie('asuInactiveHidden', asuInactiveHidden, 365);
+  } else {
+    // Convert from string to boolean
+    asuInactiveHidden = asuInactiveHidden === 'true';
+  }
+}
+
+let acceptButtonHitCount = 0;
+
+async function asuAddAlertForManualAdds() {
+  const currentCourseId = asuParseUrlForIdUrlSearchTerm(
+    window.location.href,
+    'courses'
+  );
+
+  let courseCode;
+
+  await $.get(`/api/v1/courses/${currentCourseId}`, (data2) => {
+    courseCode = data2.course_code.toUpperCase();
+  });
+
+  if (courseCode !== undefined && courseCode !== null) {
+    // add student alert for manual adds only for live courses and on first click
+    if (
+      !courseCode.startsWith('DEV') &&
+      !courseCode.startsWith('TRN') &&
+      !courseCode.startsWith('ORG') &&
+      !courseCode.startsWith('AU')
+    ) {
+      $('#addUsers').click(() => {
+        if (acceptButtonHitCount < 1) {
+          asuCreateAlertDiv(0);
+        }
+      });
+    }
+  }
+}
+
+function asuCreateAlertDiv(checkCount) {
+  const divElement = document.getElementsByClassName('addpeople__peoplesearch');
+  if (divElement.length === 0) {
+    if (checkCount < 25) {
+      const newCheckCount = checkCount + 1;
+      setTimeout(() => {
+        asuCreateAlertDiv(newCheckCount);
+      }, 100);
+    }
+  } else {
+    const alertDiv = document.createElement('div');
+    alertDiv.id = 'alert-content';
+    alertDiv.className = 'custom-asu-alert-content';
+    alertDiv.innerHTML =
+      '<p style="color: whitesmoke; padding: 35px; text-align: center; font-weight: 600">The enrollment for this course is programmatically managed and any students you add manually will be removed nightly. Please reach out to the Help Center if you would like to enroll the student permanently in this course.</p>';
+    const acceptButton = document.createElement('button');
+    acceptButton.id = 'accept-button';
+    acceptButton.innerText = 'Accept';
+    acceptButton.className = 'custom-asu-btn-maroon';
+    acceptButton.style.cssText = 'position: absolute; left: 41%;';
+    alertDiv.appendChild(acceptButton);
+
+    document.body.appendChild(alertDiv);
+    document
+      .getElementById('accept-button')
+      .addEventListener('click', asuRemoveDivElement);
+
+    $(divElement).append(alertDiv);
+  }
+}
+
+function asuRemoveDivElement() {
+  $('#alert-content').remove();
+  acceptButtonHitCount += 1;
+}
+
+function asuCheckForNewlyDeactivatedUsers(checkCount) {
+  if (!asuInactiveHidden) {
+    console.log('Inactive users should be visible, exiting.');
+    return;
+  }
+
+  let newlyDeactivated = false;
+
+  if (
+    $("span[title='This user is currently not able to access the course']")
+      .parent()
+      .parent()
+      .has(':visible').length > 0
+  ) {
+    newlyDeactivated = true;
+  }
+
+  if (newlyDeactivated) {
+    asuToggleInactiveUsers();
+    asuFixAlternatingRowStyling();
+  } else if (checkCount < 50) {
+    const newCheckCount = checkCount + 1;
+    setTimeout(() => {
+      asuCheckForNewlyDeactivatedUsers(newCheckCount);
+    }, 100);
+  }
+}
+
+function asuInjectHideShowButtonSelectorPosition(selector, position) {
+  const showHtml =
+    "<a href='#' class='btn btn-primary pull-right' id='asuToggleInactiveButton' role='button' title='Show Inactive' aria-label='Show Inactive' asuStatus='hidden' style='margin-left: 5px; z-index: 1;'>Show Inactive</a>";
+  const hideHtml =
+    "<a href='#' class='btn btn-primary pull-right' id='asuToggleInactiveButton' role='button' title='Hide Inactive' aria-label='Hide Inactive' asuStatus='visible' style='margin-left: 5px; z-index: 1;'>Hide Inactive</a>";
+
+  if (asuInactiveHidden) {
+    if (position === 'before') {
+      $(selector).before(showHtml);
+    } else {
+      $(selector).after(showHtml);
+    }
+  } else if (position === 'before') {
+    $(selector).before(hideHtml);
+  } else {
+    $(selector).after(hideHtml);
+  }
+}
+
+function asuToggleInactiveUsers() {
+  if (asuInactiveHidden) {
+    $("span[title='This user is currently not able to access the course']")
+      .parent()
+      .parent()
+      .hide();
+  } else {
+    $("span[title='This user is currently not able to access the course']")
+      .parent()
+      .parent()
+      .show();
+  }
+}
+
+function asuFixAlternatingRowStyling() {
+  $('.ic-Table.ic-Table--striped tbody tr').css('background', 'inherit');
+  $('.ic-Table.ic-Table--striped tbody tr:visible:odd').css(
+    'background',
+    '#F5F5F5'
+  );
+  $('.ic-Table.ic-Table--striped tbody tr').hover(
+    function asuTableEvenHoverHandler(e) {
+      $(this).css(
+        'background-color',
+        e.type === 'mouseenter' ? '#E5F2F8' : 'inherit'
+      );
+    }
+  );
+  $('.ic-Table.ic-Table--striped tbody tr:visible:odd').hover(
+    function asuTableOddHoverHandler(e) {
+      $(this).css(
+        'background-color',
+        e.type === 'mouseenter' ? '#E5F2F8' : '#F5F5F5'
+      );
+    }
+  );
+}
+
+function asuAttachInactiveClickHandler() {
+  $('#asuToggleInactiveButton').click(function asuToggleInactiveHandler() {
+    if ($(this).attr('asuStatus') === 'visible') {
+      $(this)
+        .attr('asuStatus', 'hidden')
+        .html('Show Inactive')
+        .attr('aria-label', 'Show Inactive')
+        .attr('title', 'Show Inactive');
+      asuInactiveHidden = true;
+    } else {
+      $(this)
+        .attr('asuStatus', 'visible')
+        .html('Hide Inactive')
+        .attr('aria-label', 'Hide Inactive')
+        .attr('title', 'Hide Inactive');
+      asuInactiveHidden = false;
+    }
+    asuToggleInactiveUsers();
+    asuFixAlternatingRowStyling();
+    // Update the cookie to their current preference
+    setCookie('asuInactiveHidden', asuInactiveHidden, 365);
+  });
+}
+
+const asuWhatAccountAreWeIn = new Promise((resolve) => {
+  if (/courses\/\d+\/settings/.test(window.location.href)) {
+    // Make API call for course and pull account id
+    const currentCourseId = asuParseUrlForIdUrlSearchTerm(
+      window.location.href,
+      'courses'
+    );
+    $.get(`/api/v1/courses/${currentCourseId}`, (data) => {
+      console.log(`Retrieved account id: ${data.account_id}`);
+      resolve(data.account_id);
+    });
+  } else if (/accounts\/\d+/.test(window.location.href)) {
+    // just pull account ID # from URL
+    resolve(asuParseUrlForIdUrlSearchTerm(window.location.href, 'accounts'));
+  }
+});
+
+function asuFilterTermsBasedOnLocation() {
+  let asuCurrentAccountId;
+  let asuSubAccount = 'ASU'; // default to ASU because that is most likely
+  const auSubAccounts = auSubAccountIds;
+
+  if (/accounts\/\d+($|\/$|\/?\?)/.test(window.location.href)) {
+    asuDisableTermFilter();
+  }
+
+  // Decide whether we want ASU or AU terms
+  asuWhatAccountAreWeIn.then(
+    (result) => {
+      asuCurrentAccountId = result;
+      console.log(`We're in account: ${asuCurrentAccountId}`);
+      if (auSubAccounts.indexOf(parseInt(asuCurrentAccountId, 10)) > -1) {
+        console.log('Changing asuSubAccount to AU');
+        asuSubAccount = 'AU';
+      }
+      const termUrl = '/api/v1/accounts/1/terms?per_page=100';
+      const termArray = [];
+
+      const asuBuildTermFilteringList = (data) => {
+        // Parse data to store relevant term details in an array
+        data.enrollment_terms.forEach((term) => {
+          if (term.name.indexOf('AU') === -1) {
+            termArray[term.id] = 'ASU';
+          } else {
+            termArray[term.id] = 'AU';
+          }
+        });
+      };
+
+      const asuCleanTermsOnPage = () => {
+        if (/accounts\/\d+($|\/$|\/?\?)/.test(window.location.href)) {
+          // For accounts > Courses, catch with mutation observer and destroy/hide unwanted spans when they're created
+          // -----------------Accounts > Courses-----------------//
+          const mutationObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              let currentSpanVal;
+              if (
+                mutation.target.dir === 'ltr' ||
+                mutation.target.localName === 'ul'
+              ) {
+                if (mutation.addedNodes.length !== 0) {
+                  $(
+                    "span[dir='ltr'] > span > span > span > div > ul > li > span > div > ul > li > span"
+                  ).each(function asuShowHideTermAccountHandler() {
+                    const spanItem = $(this);
+                    const termHeading =
+                      spanItem[0].parentNode.parentNode.parentNode.firstChild
+                        .innerText;
+
+                    // lets make sure we are only modifing the correct term list (added since we can no longer rely on list selection path above)
+                    if (
+                      termHeading === 'Show courses from' ||
+                      termHeading === 'Active Terms' ||
+                      termHeading === 'Future Terms' ||
+                      termHeading === 'Past Terms'
+                    ) {
+                      currentSpanVal = $(this).attr('value');
+                      console.log(
+                        `value = ${currentSpanVal}; - asuSubAccount: [${asuSubAccount}] and termArray[this.value]: ${termArray[currentSpanVal]}`
+                      );
+                      if (
+                        asuSubAccount === termArray[currentSpanVal] ||
+                        currentSpanVal === '1'
+                      ) {
+                        $(this).show();
+                      } else {
+                        $(this).hide();
+                      }
+
+                      if ($(this).parent().id === 'asuLoading') {
+                        $(this).parent().remove();
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          });
+
+          mutationObserver.observe(document.body, {
+            attributes: false,
+            characterData: false,
+            childList: true,
+            subtree: true,
+            attributeOldValue: false,
+            characterDataOldValue: false,
+          });
+
+          asuEnableTermFilter();
+          // -------------end Accounts > Courses----------------- //
+        } else if (/courses\/\d+\/settings/.test(window.location.href)) {
+          // -------------Course > Settings----------------- //
+          console.log(
+            `There are ${
+              $('select#course_enrollment_term_id option').length
+            } term options on page load`
+          );
+          let currentOptVal;
+          $('select#course_enrollment_term_id option').each(
+            function asuShowHideTermCourseHandler() {
+              currentOptVal = $(this).attr('value');
+              console.log(
+                `value = ${currentOptVal}; - asuSubAccount: [${asuSubAccount}] and termArray[this.value]: ${termArray[currentOptVal]}`
+              );
+              if (
+                asuSubAccount === termArray[currentOptVal] ||
+                currentOptVal === '1'
+              ) {
+                $(this).show();
+              } else {
+                $(this).hide();
+              }
+            }
+          );
+          // ---------end Course > Settings----------------- //
+        } else {
+          console.log('Unknown page detected, ignoring term filters');
+        }
+      };
+
+      paginateAPI(termUrl, asuBuildTermFilteringList, asuCleanTermsOnPage);
+    },
+    (error) => {
+      asuCurrentAccountId = error;
+    }
+  );
+}
+
+function asuDisableTermFilter() {
+  const filterBox = {};
+  filterBox.obj = $('#termFilter')
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent();
+  filterBox.top = filterBox.obj.offset().top;
+  filterBox.left = filterBox.obj.offset().left;
+  filterBox.width = filterBox.obj.css('width');
+  filterBox.height = filterBox.obj.css('height');
+  filterBox.paddingLeft = filterBox.obj.css('padding-left');
+
+  $("<div id='loadingFilterBlocker'></div>").prependTo('#wrapper');
+  $('#loadingFilterBlocker')
+    .css('position', 'absolute')
+    .css('background', 'rgba(0, 0, 0, 0.05)')
+    .css('top', filterBox.top)
+    .css('left', filterBox.left)
+    .css('width', filterBox.width)
+    .css('height', filterBox.height)
+    .css('margin-left', filterBox.paddingLeft)
+    .css('border-radius', 'var(--qBMHb-borderRadius)')
+    .css('z-index', 11);
+}
+
+function asuEnableTermFilter() {
+  $('#loadingFilterBlocker').remove();
+}
+
+// asuCheckGlobalNav and asuUpdateGlobalNav (and the event handler added to .mobile-header-hamburger
+// in the window.addEventListener('load') function) are to handle Canvas' mobile responsive global nav menu
+function asuCheckGlobalNav(asuCount, asuCustomHelpMenuDetails) {
+  if (asuCount >= 20) {
+    console.log('asuCheckGlobalNav loop stuck, exiting');
+    return;
+  }
+  const newCount = asuCount + 1;
+
+  setTimeout(() => {
+    if ($("div[aria-label='Global Navigation'][role='dialog']").length === 1) {
+      console.log(`Global Nav element found! asuCount: ${newCount}`);
+      asuUpdateGlobalNav(asuCustomHelpMenuDetails);
+    } else {
+      asuCheckGlobalNav(newCount, asuCustomHelpMenuDetails);
+    }
+  }, 100);
+}
+
+function asuUpdateGlobalNav(asuCustomHelpMenuDetails) {
+  const globalNavUl = $(
+    "div[aria-label='Global Navigation'][role='dialog'] div span ul"
+  );
+  // Check if ASU Header Links exist before adding it
+  if ($('#mobile-custom-asu-header-links').length < 1) {
+    globalNavUl.parent().append(asuCustomHelpMenuDetails);
+    // Also add Accessibility Custom Global Nav Item
+    // Grab the "Dashboard" link's parent li
+    const globalDashboardItem = $(
+      "div[aria-label='Global Navigation'][role='dialog'] li span"
+    )
+      // eslint-disable-next-line func-names
+      .filter(function () {
+        return $(this).html() === 'Dashboard';
+      })
+      .parents('li');
+    // Clone the Dashboard li and add the clone to the end of the list
+    globalDashboardItem.clone().appendTo(globalDashboardItem.parent());
+    // Grab a reference to the new li
+    const globalAccessibilityItem = $(
+      "div[aria-label='Global Navigation'][role='dialog'] li span"
+    )
+      // eslint-disable-next-line func-names
+      .filter(function () {
+        return $(this).html() === 'Dashboard';
+      })
+      .last()
+      .parents('li');
+    // Update the text from Dashboard to Accessibility
+    globalAccessibilityItem
+      .find("span:contains('Dashboard')")
+      .last()
+      .html('Accessibility');
+    // Replace the default dashboard SVG with our custom Accessibility one
+    globalAccessibilityItem
+      .find('svg')
+      .parent()
+      .append(
+        '<svg version="1.1" class="ic-icon-svg" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 26 26" style="enable-background:new 0 0 26 26; width: 2em; height: 2em;" xml:space="preserve"><g><path class="st0" d="M20.5,8.5c-4.5,1.7-9.8,1.7-15,0L4.6,8.3v3.2L5,11.7l0.1,0.1c1.7,0.5,3.2,0.9,4.6,1.1v9.7h3.4v-5h0.5v5h3.3 v-9.8c1.3-0.2,2.6-0.5,4.1-1.1l0.4-0.2V8.3L20.5,8.5z M15.5,11.6v9.7h-0.7v-5h-3.1v5H11v-9.7l-0.6,0c-1.3-0.2-2.7-0.5-4.4-1V10 c2.5,0.7,4.9,1.1,7.2,1.1c2.3,0,4.6-0.4,6.9-1.1v0.8c-1.2,0.4-2.5,0.7-4,0.9H15.5z"/><path class="st0" d="M13.2,9.1c1.6,0,2.8-1.3,2.8-2.9s-1.3-2.9-2.8-2.9c-1.6,0-2.9,1.3-2.9,2.9S11.6,9.1,13.2,9.1z M13.2,7.9 c-0.9,0-1.6-0.6-1.6-1.6c0-0.9,0.7-1.5,1.6-1.5c0.8,0,1.5,0.6,1.5,1.5C14.7,7.2,14.1,7.9,13.2,7.9z"/><path class="st0" d="M13,0.6C6.2,0.6,0.6,6.2,0.6,13S6.2,25.3,13,25.3S25.3,19.8,25.3,13S19.8,0.6,13,0.6z M13,24.1 c-6.1,0-11-5-11-11.1s5-11,11-11s11.1,5,11.1,11S19.1,24.1,13,24.1z"/></g></svg>'
+      );
+    // Remove the original SVG
+    globalAccessibilityItem.find('svg').first().remove();
+    // Update the link to point to the right place
+    globalAccessibilityItem.find('a')[0].href =
+      'https://accessibility.asu.edu/canvas-student-accessibility';
+    // Give the li an ID so that AU can easily hide it
+    globalAccessibilityItem.attr(
+      'id',
+      'asu_global_nav_mobile_accessibility_link'
+    );
+  }
+}
+
+// disable editing of course code and course name and add edit button to route edits to the CES history tab
+function addCourseSettingLinks() {
+  if (
+    !/courses\/\d+\/settings/.test(window.location.href) &&
+    !/courses\/\d+\/details/.test(window.location.href)
+  )
+    return;
+
+  asuWhatAccountAreWeIn.then((result) => {
+    const asuCurrentAccountId = result;
+    if (auSubAccountIds.indexOf(parseInt(asuCurrentAccountId, 10)) > -1) {
+      return;
+    } else {
+      const basePath = 'https://ces.apps.asu.edu';
+      const courseElements = [
+        { id: 'course_name', ariaLabel: 'Edit Course Name' },
+        { id: 'course_course_code', ariaLabel: 'Edit Course Code' },
+        { id: 'course_sis_source_id', ariaLabel: '' }, // Added to keep consistency in disabling inputs
+      ];
+
+      courseElements.forEach(({ id }) => {
+        document.getElementById(id).disabled = true;
+      });
+
+      courseElements.slice(0, 2).forEach(({ id, ariaLabel }) => {
+        const courseInput = document.getElementById(id);
+        const sisIdValue =
+          document.getElementById('course_sis_source_id').value ||
+          document.getElementById('course_sis_source_id').textContent.trim();
+        const encodedSisIdValue = encodeURIComponent(sisIdValue);
+        const link = document.createElement('a');
+
+        link.href = `${basePath}/history?editCourse=true&course_sis_id=${encodedSisIdValue}`;
+        link.target = '_blank';
+        link.innerText = ariaLabel;
+        link.style.paddingLeft = '5px';
+
+        if (ariaLabel) {
+          link.setAttribute('aria-label', ariaLabel);
+        }
+
+        courseInput.parentNode.insertBefore(link, courseInput.nextSibling);
+      });
+    }
+  });
+}
+
+window.addEventListener(
+  'message',
+  (event) => {
+    const trustedOrigins = ['https://credid.asu.edu'];
+
+    if (!trustedOrigins.includes(event.origin) || !event.data.subject) {
+      // Exit if the message is not from a trusted domain or if subject is absent
+      return;
+    }
+
+    const messageData = event.data.subject;
+
+    // Refresh the page if credId LTI sends expected message data
+    if (messageData === 'lti.refreshAfterSubmission.credId') {
+      window.location.reload();
+    }
+  },
+  false
+);
+
+window.addEventListener('load', () => {
+  // PROD ONLY - Do not copy to DEV/TEST/BETA
+  // MediaPlus analytics
+  const elementsWithUrl = document.querySelectorAll('[src],[href]');
+  const regex = /mediaplus.*\.asu\.edu\/lti\/embedded/;
+
+  elementsWithUrl.forEach((element) => {
+    const mediaplusUrl = element.src || element.href;
+    if (mediaplusUrl && mediaplusUrl.match(regex)) {
+      if (element.src) {
+        // eslint-disable-next-line no-param-reassign
+        element.src += `&userId=${window.ENV.current_user_id}`;
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        element.href += `&userId=${window.ENV.current_user_id}`;
+      }
+    }
+  });
+
+  addCourseSettingLinks();
+
+  // Initialize GA
+  asuGA(
+    window,
+    document,
+    'script',
+    'https://www.google-analytics.com/analytics.js',
+    'asu_ga'
+  );
+
+  // Fetch Canvas userId and pass with pageiew to GA
+  const USER_ID = ENV.current_user_id;
+  asu_ga('create', 'UA-42798992-21', 'auto', {
+    userId: USER_ID,
+  });
+  asu_ga('send', 'pageview');
+
+  // Check if we are on a redirect page
+  if ($('#custom_url').length > 0 && $('#custom_new_tab').length === 0) {
+    // Check if the redirect link is pointing to a Canvas domain
+    if (
+      $('#custom_url')
+        .val()
+        .substring(0, $('#custom_url').val().indexOf('/', 9)) ===
+        'https://asu.instructure.com' ||
+      $('#custom_url')
+        .val()
+        .substring(0, $('#custom_url').val().indexOf('/', 9)) ===
+        'https://canvas.asu.edu'
+    ) {
+      // Compare custom_url against current domain
+      if (
+        window.location
+          .toString()
+          .substring(0, window.location.toString().indexOf('/', 9)) !==
+        $('#custom_url')
+          .val()
+          .substring(0, $('#custom_url').val().indexOf('/', 9))
+      ) {
+        // Domains do not match, update custom_url to reflect current domain and set window.location to redirect
+        window.location =
+          window.location
+            .toString()
+            .substring(0, window.location.toString().indexOf('/', 9)) +
+          $('#custom_url')
+            .val()
+            .substring($('#custom_url').val().indexOf('/', 9));
+      }
+    }
+  }
+  // END PROD ONLY - Do not copy to DEV/TEST/BETA
+
+  // Check if we're on a course page
+  if (window.location.pathname.substring(1, 8) === 'courses') {
+    // Add hidden eye icon to course navigation link
+    const courseNavLinks = document.querySelectorAll('#section-tabs > li > a');
+    if (courseNavLinks) {
+      courseNavLinks.forEach((el) => {
+        switch (el.innerText) {
+          // Ally Dashboard
+          case 'Ally Dashboard':
+            // eslint-disable-next-line no-param-reassign
+            el.title = 'Not visible to students';
+            // eslint-disable-next-line no-param-reassign
+            el.innerHTML = `${el.innerHTML}<i class="nav-icon icon-off" aria-hidden="true" role="presentation"></i>`;
+            break;
+
+          // Rubrics
+          case 'Rubrics':
+            if (el.childElementCount === 0) {
+              // eslint-disable-next-line no-param-reassign
+              el.title = 'Not visible to students';
+              // eslint-disable-next-line no-param-reassign
+              el.innerHTML = `${el.innerHTML}<i class="nav-icon icon-off" aria-hidden="true" role="presentation"></i>`;
+            }
+            break;
+
+          // Item Banks
+          case 'Item Banks':
+            if (el.childElementCount === 0) {
+              // eslint-disable-next-line no-param-reassign
+              el.title = 'Not visible to students';
+              // eslint-disable-next-line no-param-reassign
+              el.innerHTML = `${el.innerHTML}<i class="nav-icon icon-off" aria-hidden="true" role="presentation"></i>`;
+            }
+            break;
+
+          default:
+            break;
+        }
+      });
+    }
+  }
+
+  // Check if we're on the course settings page
+  if (window.location.pathname.endsWith('settings')) {
+    // remove delete icon for CES managed sections from section tab
+    const courseSections = document.getElementsByClassName('users_count');
+
+    if (courseSections && courseSections.length > 0) {
+      for (let i = 0; i < courseSections.length; i++) {
+        const sectionElement = courseSections[i];
+
+        if (sectionElement.innerText.includes('_section_')) {
+          const { nextElementSibling } = sectionElement;
+
+          if (nextElementSibling && nextElementSibling.children) {
+            const nextElementSiblingChildren = nextElementSibling.children;
+
+            if (nextElementSiblingChildren.length === 2) {
+              nextElementSiblingChildren[1].remove();
+            } else if (nextElementSiblingChildren.length === 1) {
+              nextElementSiblingChildren[0].remove();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Check if we're on a page with term selection
+  if (
+    /accounts\/\d+($|\/$|\/?\?)/.test(window.location.href) ||
+    /courses\/\d+\/settings/.test(window.location.href)
+  ) {
+    asuFilterTermsBasedOnLocation();
+  }
+
+  // Build list of just menu details and send it to the mobile header click event
+  const asuHeaderListItems =
+    '<li><a class="Button" href="http://www.asu.edu/">ASU Home</a></li><li><a class="Button" href="https://my.asu.edu/">My ASU</a></li><li><a class="Button" href="http://www.asu.edu/colleges/">Colleges &amp; Schools</a></li><li><a class="Button" href="http://www.asu.edu/map/">Map &amp; Locations</a></li><li><a class="Button" href="http://www.asu.edu/contactasu/">Contact Us</a></li>';
+  $('.mobile-header-hamburger').click(() => {
+    asuCheckGlobalNav(
+      0,
+      `<ul id="mobile-custom-asu-header-links">${asuHeaderListItems}</ul>`
+    );
+  });
+
+  // Add header links to every page except speed grader and students' view of their assignment submissions or quiz submissions
+  if (
+    window.location.href.indexOf('submissions') === -1 &&
+    window.location.href.indexOf('speed_grader') === -1 &&
+    $('#speedgrader_iframe').length === 0 &&
+    window.location.href.indexOf('headless') === -1
+  ) {
+    $(
+      `<div class="asuHeaderPadding"></div><div id="custom-asu-header-links"><ul id="custom-asu-header-ul">${asuHeaderListItems}</ul></div>`
+    ).prependTo('#wrapper');
+  }
+
+  // Remove harmful things
+  $(
+    'div.public_options > input#course_indexed, div.public_options > label[for="course_indexed"]'
+  ).remove();
+  $('div.public_options > input[name="course[indexed]"]').val('0');
+
+  // Update 404 pages to refer students to the Help Center
+  $('a.submit_error_link').before(
+    `If you reached this page through a link in your course, please reach out to your instructor and include this URL ( ${window.location} ), as well as what you were attempting to do when you encountered the error.<br><br>If this link was not in a course, or you need assistance with other issues, please reach out to the ASU Help Center at 1-855-278-5080.`
+  );
+  $('a.submit_error_link, #submit_error_form').remove();
+
+  // Identify which page we are on and when the content has loaded
+  for (let i = 0; i <= klContentWrappersArray2.length; i++) {
+    if ($(klContentWrappersArray2[i]).length > 0) {
+      klPageContentCheck2(klContentWrappersArray2[i], 0);
+      break;
+    }
+  }
+
+  // ASU CUSTOM UNITY STYLES
+
+  /* For Custom Accordion and Custom Tabbed Panes */
+  // allow only one accordion to render
+  const acc = document.getElementsByClassName('custom-asu-card-header');
+  const panel = document.getElementsByClassName('custom-asu-card-body');
+
+  for (let i = 0; i < acc.length; i++) {
+    // eslint-disable-next-line func-names
+    acc[i].onclick = function (event) {
+      event.preventDefault();
+      const setClasses = !this.classList.contains('active');
+      const iTag = this.parentNode.parentNode.getElementsByTagName('i');
+      asuSetClass(acc, 'active', 'remove');
+      asuSetClass(panel, 'show', 'remove');
+      asuSetClass(iTag, 'icon-arrow-open-up', 'remove');
+      asuSetClass(iTag, 'icon-arrow-open-down', 'add');
+
+      if (setClasses) {
+        this.classList.toggle('active');
+        this.nextElementSibling.classList.toggle('show');
+        $(this)
+          .find('i')
+          .removeClass('icon-arrow-open-down')
+          .addClass('icon-arrow-open-up');
+      }
+    };
+  }
+
+  function asuSetClass(els, className, fnName) {
+    for (let i = 0; i < els.length; i++) {
+      els[i].classList[fnName](className);
+    }
+  }
+
+  // tabbed panes remove active class on item change
+  $('.custom-asu-nav-item').click((e) => {
+    e.preventDefault();
+    $('.active').removeClass('active');
+    $(e.currentTarget).addClass('active');
+    const tabContentId = e.currentTarget.hash;
+    $(tabContentId).addClass('show active');
+  });
+
+  /* End Custom Accordion and Tabbed Panes */
+
+  function asuCreateCopyButton(highlightDiv) {
+    const button = document.createElement('button');
+    button.className = 'copy-code-button';
+    button.type = 'button';
+    button.innerText = 'Copy';
+    button.style =
+      'float: right; height: 35px; border-radius: 5px; color: #525252; border: solid 1px #c7cdd1;';
+    button.addEventListener('click', () =>
+      asuCopyCodeToClipboard(button, highlightDiv)
+    );
+    asuAddCopyButtonToDom(button, highlightDiv);
+  }
+
+  async function asuCopyCodeToClipboard(button, highlightDiv) {
+    const codeToCopy = highlightDiv.querySelector(':last-child').innerText;
+    let result;
+    try {
+      result = await navigator.permissions.query({ name: 'clipboard-write' });
+      if (result.state === 'granted' || result.state === 'prompt') {
+        await navigator.clipboard.writeText(codeToCopy);
+      } else {
+        asuCopyCodeBlockExecCommand(codeToCopy, highlightDiv);
+      }
+    } catch (_) {
+      asuCopyCodeBlockExecCommand(codeToCopy, highlightDiv);
+    } finally {
+      asuCodeWasCopied(button);
+    }
+  }
+
+  function asuCopyCodeBlockExecCommand(codeToCopy, highlightDiv) {
+    const textArea = document.createElement('textArea');
+    textArea.contentEditable = 'true';
+    textArea.readOnly = 'false';
+    textArea.className = 'copyable-text-area';
+    textArea.value = codeToCopy;
+    highlightDiv.insertBefore(textArea, highlightDiv.firstChild);
+    const range = document.createRange();
+    range.selectNodeContents(textArea);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    textArea.setSelectionRange(0, 999999);
+    document.execCommand('copy');
+    highlightDiv.removeChild(textArea);
+  }
+
+  // change copy text to copied when button is copied
+  function asuCodeWasCopied(button) {
+    button.blur();
+    // eslint-disable-next-line no-param-reassign
+    button.innerText = 'Copied!';
+    // eslint-disable-next-line func-names
+    setTimeout(function () {
+      // eslint-disable-next-line no-param-reassign
+      button.innerText = 'Copy';
+    }, 2000);
+  }
+
+  // add copy button to the dom
+  function asuAddCopyButtonToDom(button, highlightDiv) {
+    highlightDiv.insertBefore(button, highlightDiv.firstChild);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'highlight-wrapper';
+    highlightDiv.parentNode.insertBefore(wrapper, highlightDiv);
+    wrapper.appendChild(highlightDiv);
+  }
+
+  document
+    .querySelectorAll('.custom-asu-code-highlight')
+    .forEach((highlightDiv) => asuCreateCopyButton(highlightDiv));
+  // END ASU CUSTOM UNITY STYLES
+}); // onload end
+
+// //////////////////////////////////////////////////////////////////////////// //
+// Custom Global Nav Tray                                                       //
+// //////////////////////////////////////////////////////////////////////////// //
+// https://community.canvaslms.com/thread/23242-global-nav-custom-tray
+
+(() => {
+  $(document).ready(() => {
+    // Set tray title here  //
+    const title = 'accessibility';
+
+    // Options are above for convenience, continue if you like //
+    const tidle = title.replace(/\s/g, '_').toLowerCase();
+
+    const menu = $('#menu');
+    const icon = $('<li>', {
+      id: `global_nav_${tidle}_menu`,
+      class: 'ic-app-header__menu-list-item',
+      html:
+        `<a id="global_nav_${tidle}_link" href="https://accessibility.asu.edu/canvas-student-accessibility" class="ic-app-header__menu-list-link" target="_blank">` +
+        `<div class="menu-item-icon-container" role="presentation"><span class="svg-${tidle}-holder">` +
+        '<svg version="1.1" class="ic-icon-svg" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 26 26" style="enable-background:new 0 0 26 26;" xml:space="preserve"><g><path class="st0" d="M20.5,8.5c-4.5,1.7-9.8,1.7-15,0L4.6,8.3v3.2L5,11.7l0.1,0.1c1.7,0.5,3.2,0.9,4.6,1.1v9.7h3.4v-5h0.5v5h3.3 v-9.8c1.3-0.2,2.6-0.5,4.1-1.1l0.4-0.2V8.3L20.5,8.5z M15.5,11.6v9.7h-0.7v-5h-3.1v5H11v-9.7l-0.6,0c-1.3-0.2-2.7-0.5-4.4-1V10 c2.5,0.7,4.9,1.1,7.2,1.1c2.3,0,4.6-0.4,6.9-1.1v0.8c-1.2,0.4-2.5,0.7-4,0.9H15.5z"/><path class="st0" d="M13.2,9.1c1.6,0,2.8-1.3,2.8-2.9s-1.3-2.9-2.8-2.9c-1.6,0-2.9,1.3-2.9,2.9S11.6,9.1,13.2,9.1z M13.2,7.9 c-0.9,0-1.6-0.6-1.6-1.6c0-0.9,0.7-1.5,1.6-1.5c0.8,0,1.5,0.6,1.5,1.5C14.7,7.2,14.1,7.9,13.2,7.9z"/><path class="st0" d="M13,0.6C6.2,0.6,0.6,6.2,0.6,13S6.2,25.3,13,25.3S25.3,19.8,25.3,13S19.8,0.6,13,0.6z M13,24.1 c-6.1,0-11-5-11-11.1s5-11,11-11s11.1,5,11.1,11S19.1,24.1,13,24.1z"/></g></svg>' +
+        `</span></div>` +
+        `<div class="menu-item__text">Accessibility</div></a>`,
+    });
+
+    icon.find(`.svg-${tidle}-holder`).load(() => {
+      const svg = $(this).find('svg')[0];
+      const svgId = `global_nav_${tidle}_svg`;
+      svg.setAttribute('id', svgId);
+      svg.setAttribute(
+        'class',
+        'ic-icon-svg menu-item__icon ic-icon-svg--apps svg-icon-help ic-icon-svg-custom-tray'
+      );
+      $(`#${svgId}`).find('path').removeAttr('fill');
+    });
+
+    menu.append(icon);
+  });
+})();
+// //////////////////////////////////////////////////////////////////////////// //
+        ˝  x˝Á   20250325080210-8l˚¸  I™<º	k   https://instructure-uploads.s3.amazonaws.com/account_72360000000000001/attachments/105350162/canvas-prod.js      è¶  /* eslint-disable no-use-before-define */
+/* global $, ENV, asu_ga */
+
+// TEST-BETA-PROD ONLY- Do not copy to DEV
+const auSubAccountIds = [184, 186, 187, 188, 189, 190, 191, 192, 193, 194];
+// END TEST-BETA-PROD ONLY
+
+// PROD ONLY - Do not copy to DEV, TEST, BETA
+// GA snippet
+function asuGA(i, s, o, g, r, a, m) {
+  // eslint-disable-next-line no-param-reassign
+  i.GoogleAnalyticsObject = r;
+  // eslint-disable-next-line no-param-reassign, no-unused-expressions
+  (i[r] =
+    i[r] ||
+    // eslint-disable-next-line func-names
+    function () {
+      // eslint-disable-next-line prefer-rest-params, no-param-reassign
+      (i[r].q = i[r].q || []).push(arguments);
+      // eslint-disable-next-line no-sequences
+    }),
+    // eslint-disable-next-line no-param-reassign
+    (i[r].l = 1 * new Date());
+  // eslint-disable-next-line no-unused-expressions, prefer-destructuring, no-sequences, no-param-reassign
+  (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+  // eslint-disable-next-line no-param-reassign
+  a.async = 1;
+  // eslint-disable-next-line no-param-reassign
+  a.src = g;
+  m.parentNode.insertBefore(a, m);
+}
+
+// <!-- Google Tag Manager -->
+((w, d, s, l, i) => {
+  // eslint-disable-next-line no-param-reassign
+  w[l] = w[l] || [];
+  w[l].push({
+    'gtm.start': new Date().getTime(),
+    event: 'gtm.js',
+  });
+  const f = d.getElementsByTagName(s)[0];
+  const j = d.createElement(s);
+  const dl = l !== 'dataLayer' ? `&l=${l}` : '';
+  j.async = true;
+  j.src = `https://www.googletagmanager.com/gtm.js?id=${i}${dl}`;
+  f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'dataLayer', 'GTM-PQVJ7SL');
+// <!-- End Google Tag Manager -->
+
+window.ALLY_CFG = {
+  baseUrl: 'https://prod.ally.ac',
+  clientId: 5430,
+};
+
+// eslint-disable-next-line no-undef
+$.getScript(`${ALLY_CFG.baseUrl}/integration/canvas/ally.js`);
+// END PROD ONLY - Do not copy to DEV, TEST, BETA
+
+let asuInactiveHidden;
+
+function setCookie(cName, cValue, expireInDays) {
+  const d = new Date();
+  d.setTime(d.getTime() + expireInDays * 24 * 60 * 60 * 1000);
+  const expires = `expires=${d.toUTCString()}`;
+  document.cookie = `${cName}=${cValue};${expires}; path=/`;
+}
+
+function getCookie(cName) {
+  const name = `${cName}=`;
+  const ca = document.cookie.split(';');
+  let i;
+  let c;
+  for (i = 0; i < ca.length; i++) {
+    c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return '';
+}
+
+function asuParseUrlForIdUrlSearchTerm(targetUrl, searchTerm) {
+  let start;
+  let end;
+  if (targetUrl.indexOf(searchTerm) !== -1) {
+    start = targetUrl.indexOf(searchTerm) + searchTerm.length + 1;
+    end = targetUrl.indexOf('/', start + 1);
+    if (end === -1) {
+      // If there is no next slash, the object's Id goes to the end of the string
+      end = targetUrl.length;
+    }
+    return targetUrl.substring(start, end);
+  }
+  return null;
+}
+
+// Usage: first time paginateAPI( url, processCallback, endingCallback )
+// second time paginateAPI( "", processCallback, endingCallback, count, requestObject )
+function paginateAPI(
+  targetURL = '',
+  processCallback,
+  endingCallback = '',
+  count = 0,
+  requestObject
+) {
+  if (targetURL !== '') {
+    $.ajax({
+      url: targetURL,
+      type: 'GET',
+    }).done((data, status, request) => {
+      const newCount = data.length;
+      processCallback(data, newCount);
+      paginateAPI('', processCallback, endingCallback, data.length, request);
+    });
+  } else if (requestObject.getResponseHeader('link').indexOf('next') > 0) {
+    const linkArray = requestObject.getResponseHeader('link').split(',');
+    linkArray.forEach((link) => {
+      if (link.indexOf('next') > 0) {
+        const nextUrl = link.substring(
+          link.indexOf('<') + 1,
+          link.indexOf('>')
+        );
+        $.ajax({
+          url: nextUrl,
+          type: 'GET',
+        }).done((data, status, innerRequest) => {
+          const newCount = count + data.length;
+          processCallback(data, newCount);
+          paginateAPI(
+            '',
+            processCallback,
+            endingCallback,
+            newCount,
+            innerRequest
+          );
+        });
+      }
+    });
+  } else if (endingCallback !== '') {
+    endingCallback(count);
+  }
+}
+
+// The following code can be used to identify when user content has finished loading into Canvas.
+// Similar code is used as part of USU design tools (designtools.usu.edu) hence the 2 at the end of the functions
+// You are free to use this however you would like - Kenneth Larsen, Utah State University
+// If any of these elements exist, we will watch for page content in them to load
+const klContentWrappersArray2 = [
+  '#course_home_content', // Course Front Page
+  '#wiki_page_show', // Content page
+  '#discussion_topic', // Discussions page
+  '#course_syllabus', // Syllabus page
+  '#assignment_show', // Assignments page
+  '#wiki_page_revisions',
+  '#people-options', // People page
+  '#gradebook_wrapper', // Gradebook (instructor)
+];
+
+// Check to see if the page content has loaded yet
+function klPageContentCheck2(klContentWrapperElement2, checkCount) {
+  let contentLoaded = false;
+  // Content Pages
+  if (
+    $('.show-content').length > 0 &&
+    $('.show-content').children().length > 0
+  ) {
+    contentLoaded = true;
+    // Discussions
+  } else if (
+    $('#discussion_topic').length > 0 &&
+    $('.user_content').text().length > 0
+  ) {
+    contentLoaded = true;
+    // Assignment (Teacher View)
+  } else if ($('#assignment_show .teacher-version').length > 0) {
+    contentLoaded = true;
+  } else if ($('#assignment_show .student-version').length > 0) {
+    contentLoaded = true;
+  } else if ($('#course_syllabus').length > 0) {
+    contentLoaded = true;
+  } else if (
+    $('div[data-view="users"]').length > 0 &&
+    document.querySelector('tbody.collectionViewItems') !== null
+  ) {
+    // people page
+    contentLoaded = true;
+  } else if (
+    $("#gradebook-grid-wrapper div[id*='assignment_'].assignment button")
+      .length > 0
+  ) {
+    // gradebook
+    contentLoaded = true;
+  }
+
+  if (contentLoaded) {
+    console.log('Content has loaded');
+    klAfterContentLoaded2();
+  } else if (checkCount < 50) {
+    const newCheckCount = checkCount + 1;
+    setTimeout(() => {
+      console.log(
+        `Still no content, check again (${klContentWrapperElement2})`
+      );
+      klPageContentCheck2(klContentWrapperElement2, newCheckCount);
+    }, 100);
+  }
+}
+
+function klAfterContentLoaded2() {
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Community%20of%20Care%3A%20Coming%20to%20Campus']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Community%20of%20Care%3A%20Coming%20to%20Campus&name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Devils%204%20Devils%3A%20Creating%20a%20Safe%20and%20Caring%20Community']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Devils%204%20Devils%3A%20Creating%20a%20Safe%20and%20Caring%20Community&name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate-sustainability/certificate.html']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate-sustainability/certificate.html#name=${ENV.current_user.display_name}`
+  );
+  $(
+    "a[href='https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Free%20Speech%20at%20ASU']"
+  ).attr(
+    'href',
+    `https://www.asu.edu/it/acadtech/certificate/certificate.html#course=Free%20Speech%20at%20ASU&name=${ENV.current_user.display_name}`
+  );
+
+  // Check if we're on the People page
+  if (
+    document.querySelector('tbody.collectionViewItems') !== null &&
+    window.location.toString().indexOf('users') > 0
+  ) {
+    asuInactivePeoplePage();
+    asuAddAlertForManualAdds();
+  }
+}
+
+function asuInactivePeoplePage() {
+  // Check if an "asuInactiveHidden" cookie exists, if not set it to false (visible)
+  asuCheckInactiveCookie();
+
+  // Create a mutationObserver that will hide inactive users when the roster list changes (if that is the current user's preference)
+  const mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach(() => {
+      // console.log(mutation);
+      // If inactive users should be hidden, hide them
+      if (asuInactiveHidden) {
+        asuToggleInactiveUsers();
+      }
+    });
+
+    // Add click event to deactivateUser to catch new rows added to the table
+    let i;
+    for (
+      i = 0;
+      i <
+      $("td.right div.admin-links ul li a[data-event='deactivateUser']").length;
+      i++
+    ) {
+      // Check if we've set a custom attribute on the link to store its state
+      if (
+        !$("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+          i
+        ].getAttribute('hasASUClickEvent')
+      ) {
+        // If not, then add the attribute and the event listener
+        $("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+          i
+        ].setAttribute('hasASUClickEvent', true);
+        $("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+          i
+        ].addEventListener('click', () => {
+          asuCheckForNewlyDeactivatedUsers(0);
+        });
+        console.log(
+          `adding event to ${
+            $("td.right div.admin-links ul li a[data-event='deactivateUser']")[
+              i
+            ].parentElement.parentElement.parentElement.parentElement
+              .parentElement.id
+          }`
+        );
+      }
+    }
+  });
+
+  const tableBody = document.querySelector('tbody.collectionViewItems');
+
+  const config = { attributes: true, childList: true, characterData: true };
+
+  mutationObserver.observe(tableBody, config);
+
+  asuInjectHideShowButtonSelectorPosition(
+    "a[aria-label='Add People']",
+    'before'
+  );
+  asuToggleInactiveUsers();
+  asuFixAlternatingRowStyling();
+  asuAttachInactiveClickHandler();
+
+  $("td.right div.admin-links ul li a[data-event='deactivateUser']").click(
+    () => {
+      asuCheckForNewlyDeactivatedUsers(0);
+    }
+  );
+}
+
+function asuCheckInactiveCookie() {
+  asuInactiveHidden = getCookie('asuInactiveHidden');
+  if (asuInactiveHidden === '') {
+    // Default to false
+    asuInactiveHidden = false;
+    setCookie('asuInactiveHidden', asuInactiveHidden, 365);
+  } else {
+    // Convert from string to boolean
+    asuInactiveHidden = asuInactiveHidden === 'true';
+  }
+}
+
+let acceptButtonHitCount = 0;
+
+async function asuAddAlertForManualAdds() {
+  const currentCourseId = asuParseUrlForIdUrlSearchTerm(
+    window.location.href,
+    'courses'
+  );
+
+  let courseCode;
+
+  await $.get(`/api/v1/courses/${currentCourseId}`, (data2) => {
+    courseCode = data2.course_code.toUpperCase();
+  });
+
+  if (courseCode !== undefined && courseCode !== null) {
+    // add student alert for manual adds only for live courses and on first click
+    if (
+      !courseCode.startsWith('DEV') &&
+      !courseCode.startsWith('TRN') &&
+      !courseCode.startsWith('ORG') &&
+      !courseCode.startsWith('AU')
+    ) {
+      $('#addUsers').click(() => {
+        if (acceptButtonHitCount < 1) {
+          asuCreateAlertDiv(0);
+        }
+      });
+    }
+  }
+}
+
+function asuCreateAlertDiv(checkCount) {
+  const divElement = document.getElementsByClassName('addpeople__peoplesearch');
+  if (divElement.length === 0) {
+    if (checkCount < 25) {
+      const newCheckCount = checkCount + 1;
+      setTimeout(() => {
+        asuCreateAlertDiv(newCheckCount);
+      }, 100);
+    }
+  } else {
+    const alertDiv = document.createElement('div');
+    alertDiv.id = 'alert-content';
+    alertDiv.className = 'custom-asu-alert-content';
+    alertDiv.innerHTML =
+      '<p style="color: whitesmoke; padding: 35px; text-align: center; font-weight: 600">The enrollment for this course is programmatically managed and any students you add manually will be removed nightly. Please reach out to the Help Center if you would like to enroll the student permanently in this course.</p>';
+    const acceptButton = document.createElement('button');
+    acceptButton.id = 'accept-button';
+    acceptButton.innerText = 'Accept';
+    acceptButton.className = 'custom-asu-btn-maroon';
+    acceptButton.style.cssText = 'position: absolute; left: 41%;';
+    alertDiv.appendChild(acceptButton);
+
+    document.body.appendChild(alertDiv);
+    document
+      .getElementById('accept-button')
+      .addEventListener('click', asuRemoveDivElement);
+
+    $(divElement).append(alertDiv);
+  }
+}
+
+function asuRemoveDivElement() {
+  $('#alert-content').remove();
+  acceptButtonHitCount += 1;
+}
+
+function asuCheckForNewlyDeactivatedUsers(checkCount) {
+  if (!asuInactiveHidden) {
+    console.log('Inactive users should be visible, exiting.');
+    return;
+  }
+
+  let newlyDeactivated = false;
+
+  if (
+    $("span[title='This user is currently not able to access the course']")
+      .parent()
+      .parent()
+      .has(':visible').length > 0
+  ) {
+    newlyDeactivated = true;
+  }
+
+  if (newlyDeactivated) {
+    asuToggleInactiveUsers();
+    asuFixAlternatingRowStyling();
+  } else if (checkCount < 50) {
+    const newCheckCount = checkCount + 1;
+    setTimeout(() => {
+      asuCheckForNewlyDeactivatedUsers(newCheckCount);
+    }, 100);
+  }
+}
+
+function asuInjectHideShowButtonSelectorPosition(selector, position) {
+  const showHtml =
+    "<a href='#' class='btn btn-primary pull-right' id='asuToggleInactiveButton' role='button' title='Show Inactive' aria-label='Show Inactive' asuStatus='hidden' style='margin-left: 5px; z-index: 1;'>Show Inactive</a>";
+  const hideHtml =
+    "<a href='#' class='btn btn-primary pull-right' id='asuToggleInactiveButton' role='button' title='Hide Inactive' aria-label='Hide Inactive' asuStatus='visible' style='margin-left: 5px; z-index: 1;'>Hide Inactive</a>";
+
+  if (asuInactiveHidden) {
+    if (position === 'before') {
+      $(selector).before(showHtml);
+    } else {
+      $(selector).after(showHtml);
+    }
+  } else if (position === 'before') {
+    $(selector).before(hideHtml);
+  } else {
+    $(selector).after(hideHtml);
+  }
+}
+
+function asuToggleInactiveUsers() {
+  if (asuInactiveHidden) {
+    $("span[title='This user is currently not able to access the course']")
+      .parent()
+      .parent()
+      .hide();
+  } else {
+    $("span[title='This user is currently not able to access the course']")
+      .parent()
+      .parent()
+      .show();
+  }
+}
+
+function asuFixAlternatingRowStyling() {
+  $('.ic-Table.ic-Table--striped tbody tr').css('background', 'inherit');
+  $('.ic-Table.ic-Table--striped tbody tr:visible:odd').css(
+    'background',
+    '#F5F5F5'
+  );
+  $('.ic-Table.ic-Table--striped tbody tr').hover(
+    function asuTableEvenHoverHandler(e) {
+      $(this).css(
+        'background-color',
+        e.type === 'mouseenter' ? '#E5F2F8' : 'inherit'
+      );
+    }
+  );
+  $('.ic-Table.ic-Table--striped tbody tr:visible:odd').hover(
+    function asuTableOddHoverHandler(e) {
+      $(this).css(
+        'background-color',
+        e.type === 'mouseenter' ? '#E5F2F8' : '#F5F5F5'
+      );
+    }
+  );
+}
+
+function asuAttachInactiveClickHandler() {
+  $('#asuToggleInactiveButton').click(function asuToggleInactiveHandler() {
+    if ($(this).attr('asuStatus') === 'visible') {
+      $(this)
+        .attr('asuStatus', 'hidden')
+        .html('Show Inactive')
+        .attr('aria-label', 'Show Inactive')
+        .attr('title', 'Show Inactive');
+      asuInactiveHidden = true;
+    } else {
+      $(this)
+        .attr('asuStatus', 'visible')
+        .html('Hide Inactive')
+        .attr('aria-label', 'Hide Inactive')
+        .attr('title', 'Hide Inactive');
+      asuInactiveHidden = false;
+    }
+    asuToggleInactiveUsers();
+    asuFixAlternatingRowStyling();
+    // Update the cookie to their current preference
+    setCookie('asuInactiveHidden', asuInactiveHidden, 365);
+  });
+}
+
+const asuWhatAccountAreWeIn = new Promise((resolve) => {
+  if (/courses\/\d+\/settings/.test(window.location.href)) {
+    // Make API call for course and pull account id
+    const currentCourseId = asuParseUrlForIdUrlSearchTerm(
+      window.location.href,
+      'courses'
+    );
+    $.get(`/api/v1/courses/${currentCourseId}`, (data) => {
+      console.log(`Retrieved account id: ${data.account_id}`);
+      resolve(data.account_id);
+    });
+  } else if (/accounts\/\d+/.test(window.location.href)) {
+    // just pull account ID # from URL
+    resolve(asuParseUrlForIdUrlSearchTerm(window.location.href, 'accounts'));
+  }
+});
+
+function asuFilterTermsBasedOnLocation() {
+  let asuCurrentAccountId;
+  let asuSubAccount = 'ASU'; // default to ASU because that is most likely
+  const auSubAccounts = auSubAccountIds;
+
+  if (/accounts\/\d+($|\/$|\/?\?)/.test(window.location.href)) {
+    asuDisableTermFilter();
+  }
+
+  // Decide whether we want ASU or AU terms
+  asuWhatAccountAreWeIn.then(
+    (result) => {
+      asuCurrentAccountId = result;
+      console.log(`We're in account: ${asuCurrentAccountId}`);
+      if (auSubAccounts.indexOf(parseInt(asuCurrentAccountId, 10)) > -1) {
+        console.log('Changing asuSubAccount to AU');
+        asuSubAccount = 'AU';
+      }
+      const termUrl = '/api/v1/accounts/1/terms?per_page=100';
+      const termArray = [];
+
+      const asuBuildTermFilteringList = (data) => {
+        // Parse data to store relevant term details in an array
+        data.enrollment_terms.forEach((term) => {
+          if (term.name.indexOf('AU') === -1) {
+            termArray[term.id] = 'ASU';
+          } else {
+            termArray[term.id] = 'AU';
+          }
+        });
+      };
+
+      const asuCleanTermsOnPage = () => {
+        if (/accounts\/\d+($|\/$|\/?\?)/.test(window.location.href)) {
+          // For accounts > Courses, catch with mutation observer and destroy/hide unwanted spans when they're created
+          // -----------------Accounts > Courses-----------------//
+          const mutationObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              let currentSpanVal;
+              if (
+                mutation.target.dir === 'ltr' ||
+                mutation.target.localName === 'ul'
+              ) {
+                if (mutation.addedNodes.length !== 0) {
+                  $(
+                    "span[dir='ltr'] > span > span > span > div > ul > li > span > div > ul > li > span"
+                  ).each(function asuShowHideTermAccountHandler() {
+                    const spanItem = $(this);
+                    const termHeading =
+                      spanItem[0].parentNode.parentNode.parentNode.firstChild
+                        .innerText;
+
+                    // lets make sure we are only modifing the correct term list (added since we can no longer rely on list selection path above)
+                    if (
+                      termHeading === 'Show courses from' ||
+                      termHeading === 'Active Terms' ||
+                      termHeading === 'Future Terms' ||
+                      termHeading === 'Past Terms'
+                    ) {
+                      currentSpanVal = $(this).attr('value');
+                      console.log(
+                        `value = ${currentSpanVal}; - asuSubAccount: [${asuSubAccount}] and termArray[this.value]: ${termArray[currentSpanVal]}`
+                      );
+                      if (
+                        asuSubAccount === termArray[currentSpanVal] ||
+                        currentSpanVal === '1'
+                      ) {
+                        $(this).show();
+                      } else {
+                        $(this).hide();
+                      }
+
+                      if ($(this).parent().id === 'asuLoading') {
+                        $(this).parent().remove();
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          });
+
+          mutationObserver.observe(document.body, {
+            attributes: false,
+            characterData: false,
+            childList: true,
+            subtree: true,
+            attributeOldValue: false,
+            characterDataOldValue: false,
+          });
+
+          asuEnableTermFilter();
+          // -------------end Accounts > Courses----------------- //
+        } else if (/courses\/\d+\/settings/.test(window.location.href)) {
+          // -------------Course > Settings----------------- //
+          console.log(
+            `There are ${
+              $('select#course_enrollment_term_id option').length
+            } term options on page load`
+          );
+          let currentOptVal;
+          $('select#course_enrollment_term_id option').each(
+            function asuShowHideTermCourseHandler() {
+              currentOptVal = $(this).attr('value');
+              console.log(
+                `value = ${currentOptVal}; - asuSubAccount: [${asuSubAccount}] and termArray[this.value]: ${termArray[currentOptVal]}`
+              );
+              if (
+                asuSubAccount === termArray[currentOptVal] ||
+                currentOptVal === '1'
+              ) {
+                $(this).show();
+              } else {
+                $(this).hide();
+              }
+            }
+          );
+          // ---------end Course > Settings----------------- //
+        } else {
+          console.log('Unknown page detected, ignoring term filters');
+        }
+      };
+
+      paginateAPI(termUrl, asuBuildTermFilteringList, asuCleanTermsOnPage);
+    },
+    (error) => {
+      asuCurrentAccountId = error;
+    }
+  );
+}
+
+function asuDisableTermFilter() {
+  const filterBox = {};
+  filterBox.obj = $('#termFilter')
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .parent();
+  filterBox.top = filterBox.obj.offset().top;
+  filterBox.left = filterBox.obj.offset().left;
+  filterBox.width = filterBox.obj.css('width');
+  filterBox.height = filterBox.obj.css('height');
+  filterBox.paddingLeft = filterBox.obj.css('padding-left');
+
+  $("<div id='loadingFilterBlocker'></div>").prependTo('#wrapper');
+  $('#loadingFilterBlocker')
+    .css('position', 'absolute')
+    .css('background', 'rgba(0, 0, 0, 0.05)')
+    .css('top', filterBox.top)
+    .css('left', filterBox.left)
+    .css('width', filterBox.width)
+    .css('height', filterBox.height)
+    .css('margin-left', filterBox.paddingLeft)
+    .css('border-radius', 'var(--qBMHb-borderRadius)')
+    .css('z-index', 11);
+}
+
+function asuEnableTermFilter() {
+  $('#loadingFilterBlocker').remove();
+}
+
+// asuCheckGlobalNav and asuUpdateGlobalNav (and the event handler added to .mobile-header-hamburger
+// in the window.addEventListener('load') function) are to handle Canvas' mobile responsive global nav menu
+function asuCheckGlobalNav(asuCount, asuCustomHelpMenuDetails) {
+  if (asuCount >= 20) {
+    console.log('asuCheckGlobalNav loop stuck, exiting');
+    return;
+  }
+  const newCount = asuCount + 1;
+
+  setTimeout(() => {
+    if ($("div[aria-label='Global Navigation'][role='dialog']").length === 1) {
+      console.log(`Global Nav element found! asuCount: ${newCount}`);
+      asuUpdateGlobalNav(asuCustomHelpMenuDetails);
+    } else {
+      asuCheckGlobalNav(newCount, asuCustomHelpMenuDetails);
+    }
+  }, 100);
+}
+
+function asuUpdateGlobalNav(asuCustomHelpMenuDetails) {
+  const globalNavUl = $(
+    "div[aria-label='Global Navigation'][role='dialog'] div span ul"
+  );
+  // Check if ASU Header Links exist before adding it
+  if ($('#mobile-custom-asu-header-links').length < 1) {
+    globalNavUl.parent().append(asuCustomHelpMenuDetails);
+    // Also add Accessibility Custom Global Nav Item
+    // Grab the "Dashboard" link's parent li
+    const globalDashboardItem = $(
+      "div[aria-label='Global Navigation'][role='dialog'] li span"
+    )
+      // eslint-disable-next-line func-names
+      .filter(function () {
+        return $(this).html() === 'Dashboard';
+      })
+      .parents('li');
+    // Clone the Dashboard li and add the clone to the end of the list
+    globalDashboardItem.clone().appendTo(globalDashboardItem.parent());
+    // Grab a reference to the new li
+    const globalAccessibilityItem = $(
+      "div[aria-label='Global Navigation'][role='dialog'] li span"
+    )
+      // eslint-disable-next-line func-names
+      .filter(function () {
+        return $(this).html() === 'Dashboard';
+      })
+      .last()
+      .parents('li');
+    // Update the text from Dashboard to Accessibility
+    globalAccessibilityItem
+      .find("span:contains('Dashboard')")
+      .last()
+      .html('Accessibility');
+    // Replace the default dashboard SVG with our custom Accessibility one
+    globalAccessibilityItem
+      .find('svg')
+      .parent()
+      .append(
+        '<svg version="1.1" class="ic-icon-svg" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 26 26" style="enable-background:new 0 0 26 26; width: 2em; height: 2em;" xml:space="preserve"><g><path class="st0" d="M20.5,8.5c-4.5,1.7-9.8,1.7-15,0L4.6,8.3v3.2L5,11.7l0.1,0.1c1.7,0.5,3.2,0.9,4.6,1.1v9.7h3.4v-5h0.5v5h3.3 v-9.8c1.3-0.2,2.6-0.5,4.1-1.1l0.4-0.2V8.3L20.5,8.5z M15.5,11.6v9.7h-0.7v-5h-3.1v5H11v-9.7l-0.6,0c-1.3-0.2-2.7-0.5-4.4-1V10 c2.5,0.7,4.9,1.1,7.2,1.1c2.3,0,4.6-0.4,6.9-1.1v0.8c-1.2,0.4-2.5,0.7-4,0.9H15.5z"/><path class="st0" d="M13.2,9.1c1.6,0,2.8-1.3,2.8-2.9s-1.3-2.9-2.8-2.9c-1.6,0-2.9,1.3-2.9,2.9S11.6,9.1,13.2,9.1z M13.2,7.9 c-0.9,0-1.6-0.6-1.6-1.6c0-0.9,0.7-1.5,1.6-1.5c0.8,0,1.5,0.6,1.5,1.5C14.7,7.2,14.1,7.9,13.2,7.9z"/><path class="st0" d="M13,0.6C6.2,0.6,0.6,6.2,0.6,13S6.2,25.3,13,25.3S25.3,19.8,25.3,13S19.8,0.6,13,0.6z M13,24.1 c-6.1,0-11-5-11-11.1s5-11,11-11s11.1,5,11.1,11S19.1,24.1,13,24.1z"/></g></svg>'
+      );
+    // Remove the original SVG
+    globalAccessibilityItem.find('svg').first().remove();
+    // Update the link to point to the right place
+    globalAccessibilityItem.find('a')[0].href =
+      'https://accessibility.asu.edu/canvas-student-accessibility';
+    // Give the li an ID so that AU can easily hide it
+    globalAccessibilityItem.attr(
+      'id',
+      'asu_global_nav_mobile_accessibility_link'
+    );
+  }
+}
+
+// disable editing of course code and course name and add edit button to route edits to the CES history tab
+function addCourseSettingLinks() {
+  if (
+    !/courses\/\d+\/settings/.test(window.location.href) &&
+    !/courses\/\d+\/details/.test(window.location.href)
+  )
+    return;
+
+  asuWhatAccountAreWeIn.then((result) => {
+    const asuCurrentAccountId = result;
+    if (auSubAccountIds.indexOf(parseInt(asuCurrentAccountId, 10)) > -1) {
+      return;
+    } else {
+      const basePath = 'https://ces.apps.asu.edu';
+      const courseElements = [
+        { id: 'course_name', ariaLabel: 'Edit Course Name' },
+        { id: 'course_course_code', ariaLabel: 'Edit Course Code' },
+        { id: 'course_sis_source_id', ariaLabel: '' }, // Added to keep consistency in disabling inputs
+      ];
+
+      courseElements.forEach(({ id }) => {
+        document.getElementById(id).disabled = true;
+      });
+
+      courseElements.slice(0, 2).forEach(({ id, ariaLabel }) => {
+        const courseInput = document.getElementById(id);
+        const sisIdValue =
+          document.getElementById('course_sis_source_id').value ||
+          document.getElementById('course_sis_source_id').textContent.trim();
+        const encodedSisIdValue = encodeURIComponent(sisIdValue);
+        const link = document.createElement('a');
+
+        link.href = `${basePath}/history?editCourse=true&course_sis_id=${encodedSisIdValue}`;
+        link.target = '_blank';
+        link.innerText = ariaLabel;
+        link.style.paddingLeft = '5px';
+
+        if (ariaLabel) {
+          link.setAttribute('aria-label', ariaLabel);
+        }
+
+        courseInput.parentNode.insertBefore(link, courseInput.nextSibling);
+      });
+    }
+  });
+}
+
+window.addEventListener(
+  'message',
+  (event) => {
+    const trustedOrigins = ['https://credid.asu.edu'];
+
+    if (!trustedOrigins.includes(event.origin) || !event.data.subject) {
+      // Exit if the message is not from a trusted domain or if subject is absent
+      return;
+    }
+
+    const messageData = event.data.subject;
+
+    // Refresh the page if credId LTI sends expected message data
+    if (messageData === 'lti.refreshAfterSubmission.credId') {
+      window.location.reload();
+    }
+  },
+  false
+);
+
+window.addEventListener('load', () => {
+  // PROD ONLY - Do not copy to DEV/TEST/BETA
+  // MediaPlus analytics
+  const elementsWithUrl = document.querySelectorAll('[src],[href]');
+  const regex = /mediaplus.*\.asu\.edu\/lti\/embedded/;
+
+  elementsWithUrl.forEach((element) => {
+    const mediaplusUrl = element.src || element.href;
+    if (mediaplusUrl && mediaplusUrl.match(regex)) {
+      if (element.src) {
+        // eslint-disable-next-line no-param-reassign
+        element.src += `&userId=${window.ENV.current_user_id}`;
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        element.href += `&userId=${window.ENV.current_user_id}`;
+      }
+    }
+  });
+
+  addCourseSettingLinks();
+
+  // Initialize GA
+  asuGA(
+    window,
+    document,
+    'script',
+    'https://www.google-analytics.com/analytics.js',
+    'asu_ga'
+  );
+
+  // Fetch Canvas userId and pass with pageiew to GA
+  const USER_ID = ENV.current_user_id;
+  asu_ga('create', 'UA-42798992-21', 'auto', {
+    userId: USER_ID,
+  });
+  asu_ga('send', 'pageview');
+
+  // Check if we are on a redirect page
+  if ($('#custom_url').length > 0 && $('#custom_new_tab').length === 0) {
+    // Check if the redirect link is pointing to a Canvas domain
+    if (
+      $('#custom_url')
+        .val()
+        .substring(0, $('#custom_url').val().indexOf('/', 9)) ===
+        'https://asu.instructure.com' ||
+      $('#custom_url')
+        .val()
+        .substring(0, $('#custom_url').val().indexOf('/', 9)) ===
+        'https://canvas.asu.edu'
+    ) {
+      // Compare custom_url against current domain
+      if (
+        window.location
+          .toString()
+          .substring(0, window.location.toString().indexOf('/', 9)) !==
+        $('#custom_url')
+          .val()
+          .substring(0, $('#custom_url').val().indexOf('/', 9))
+      ) {
+        // Domains do not match, update custom_url to reflect current domain and set window.location to redirect
+        window.location =
+          window.location
+            .toString()
+            .substring(0, window.location.toString().indexOf('/', 9)) +
+          $('#custom_url')
+            .val()
+            .substring($('#custom_url').val().indexOf('/', 9));
+      }
+    }
+  }
+  // END PROD ONLY - Do not copy to DEV/TEST/BETA
+
+  // Check if we're on a course page
+  if (window.location.pathname.substring(1, 8) === 'courses') {
+    // Add hidden eye icon to course navigation link
+    const courseNavLinks = document.querySelectorAll('#section-tabs > li > a');
+    if (courseNavLinks) {
+      courseNavLinks.forEach((el) => {
+        switch (el.innerText) {
+          // Ally Dashboard
+          case 'Ally Dashboard':
+            // eslint-disable-next-line no-param-reassign
+            el.title = 'Not visible to students';
+            // eslint-disable-next-line no-param-reassign
+            el.innerHTML = `${el.innerHTML}<i class="nav-icon icon-off" aria-hidden="true" role="presentation"></i>`;
+            break;
+
+          // Rubrics
+          case 'Rubrics':
+            if (el.childElementCount === 0) {
+              // eslint-disable-next-line no-param-reassign
+              el.title = 'Not visible to students';
+              // eslint-disable-next-line no-param-reassign
+              el.innerHTML = `${el.innerHTML}<i class="nav-icon icon-off" aria-hidden="true" role="presentation"></i>`;
+            }
+            break;
+
+          // Item Banks
+          case 'Item Banks':
+            if (el.childElementCount === 0) {
+              // eslint-disable-next-line no-param-reassign
+              el.title = 'Not visible to students';
+              // eslint-disable-next-line no-param-reassign
+              el.innerHTML = `${el.innerHTML}<i class="nav-icon icon-off" aria-hidden="true" role="presentation"></i>`;
+            }
+            break;
+
+          default:
+            break;
+        }
+      });
+    }
+  }
+
+  // Check if we're on the course settings page
+  if (window.location.pathname.endsWith('settings')) {
+    // remove delete icon for CES managed sections from section tab
+    const courseSections = document.getElementsByClassName('users_count');
+
+    if (courseSections && courseSections.length > 0) {
+      for (let i = 0; i < courseSections.length; i++) {
+        const sectionElement = courseSections[i];
+
+        if (sectionElement.innerText.includes('_section_')) {
+          const { nextElementSibling } = sectionElement;
+
+          if (nextElementSibling && nextElementSibling.children) {
+            const nextElementSiblingChildren = nextElementSibling.children;
+
+            if (nextElementSiblingChildren.length === 2) {
+              nextElementSiblingChildren[1].remove();
+            } else if (nextElementSiblingChildren.length === 1) {
+              nextElementSiblingChildren[0].remove();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Check if we're on a page with term selection
+  if (
+    /accounts\/\d+($|\/$|\/?\?)/.test(window.location.href) ||
+    /courses\/\d+\/settings/.test(window.location.href)
+  ) {
+    asuFilterTermsBasedOnLocation();
+  }
+
+  // Build list of just menu details and send it to the mobile header click event
+  const asuHeaderListItems =
+    '<li><a class="Button" href="http://www.asu.edu/">ASU Home</a></li><li><a class="Button" href="https://my.asu.edu/">My ASU</a></li><li><a class="Button" href="http://www.asu.edu/colleges/">Colleges &amp; Schools</a></li><li><a class="Button" href="http://www.asu.edu/map/">Map &amp; Locations</a></li><li><a class="Button" href="http://www.asu.edu/contactasu/">Contact Us</a></li>';
+  $('.mobile-header-hamburger').click(() => {
+    asuCheckGlobalNav(
+      0,
+      `<ul id="mobile-custom-asu-header-links">${asuHeaderListItems}</ul>`
+    );
+  });
+
+  // Add header links to every page except speed grader and students' view of their assignment submissions or quiz submissions
+  if (
+    window.location.href.indexOf('submissions') === -1 &&
+    window.location.href.indexOf('speed_grader') === -1 &&
+    $('#speedgrader_iframe').length === 0 &&
+    window.location.href.indexOf('headless') === -1
+  ) {
+    $(
+      `<div class="asuHeaderPadding"></div><div id="custom-asu-header-links"><ul id="custom-asu-header-ul">${asuHeaderListItems}</ul></div>`
+    ).prependTo('#wrapper');
+  }
+
+  // Remove harmful things
+  $(
+    'div.public_options > input#course_indexed, div.public_options > label[for="course_indexed"]'
+  ).remove();
+  $('div.public_options > input[name="course[indexed]"]').val('0');
+
+  // Update 404 pages to refer students to the Help Center
+  $('a.submit_error_link').before(
+    `If you reached this page through a link in your course, please reach out to your instructor and include this URL ( ${window.location} ), as well as what you were attempting to do when you encountered the error.<br><br>If this link was not in a course, or you need assistance with other issues, please reach out to the ASU Help Center at 1-855-278-5080.`
+  );
+  $('a.submit_error_link, #submit_error_form').remove();
+
+  // Identify which page we are on and when the content has loaded
+  for (let i = 0; i <= klContentWrappersArray2.length; i++) {
+    if ($(klContentWrappersArray2[i]).length > 0) {
+      klPageContentCheck2(klContentWrappersArray2[i], 0);
+      break;
+    }
+  }
+
+  // ASU CUSTOM UNITY STYLES
+
+  /* For Custom Accordion and Custom Tabbed Panes */
+  // allow only one accordion to render
+  const acc = document.getElementsByClassName('custom-asu-card-header');
+  const panel = document.getElementsByClassName('custom-asu-card-body');
+
+  for (let i = 0; i < acc.length; i++) {
+    // eslint-disable-next-line func-names
+    acc[i].onclick = function (event) {
+      event.preventDefault();
+      const setClasses = !this.classList.contains('active');
+      const iTag = this.parentNode.parentNode.getElementsByTagName('i');
+      asuSetClass(acc, 'active', 'remove');
+      asuSetClass(panel, 'show', 'remove');
+      asuSetClass(iTag, 'icon-arrow-open-up', 'remove');
+      asuSetClass(iTag, 'icon-arrow-open-down', 'add');
+
+      if (setClasses) {
+        this.classList.toggle('active');
+        this.nextElementSibling.classList.toggle('show');
+        $(this)
+          .find('i')
+          .removeClass('icon-arrow-open-down')
+          .addClass('icon-arrow-open-up');
+      }
+    };
+  }
+
+  function asuSetClass(els, className, fnName) {
+    for (let i = 0; i < els.length; i++) {
+      els[i].classList[fnName](className);
+    }
+  }
+
+  // tabbed panes remove active class on item change
+  $('.custom-asu-nav-item').click((e) => {
+    e.preventDefault();
+    $('.active').removeClass('active');
+    $(e.currentTarget).addClass('active');
+    const tabContentId = e.currentTarget.hash;
+    $(tabContentId).addClass('show active');
+  });
+
+  /* End Custom Accordion and Tabbed Panes */
+
+  function asuCreateCopyButton(highlightDiv) {
+    const button = document.createElement('button');
+    button.className = 'copy-code-button';
+    button.type = 'button';
+    button.innerText = 'Copy';
+    button.style =
+      'float: right; height: 35px; border-radius: 5px; color: #525252; border: solid 1px #c7cdd1;';
+    button.addEventListener('click', () =>
+      asuCopyCodeToClipboard(button, highlightDiv)
+    );
+    asuAddCopyButtonToDom(button, highlightDiv);
+  }
+
+  async function asuCopyCodeToClipboard(button, highlightDiv) {
+    const codeToCopy = highlightDiv.querySelector(':last-child').innerText;
+    let result;
+    try {
+      result = await navigator.permissions.query({ name: 'clipboard-write' });
+      if (result.state === 'granted' || result.state === 'prompt') {
+        await navigator.clipboard.writeText(codeToCopy);
+      } else {
+        asuCopyCodeBlockExecCommand(codeToCopy, highlightDiv);
+      }
+    } catch (_) {
+      asuCopyCodeBlockExecCommand(codeToCopy, highlightDiv);
+    } finally {
+      asuCodeWasCopied(button);
+    }
+  }
+
+  function asuCopyCodeBlockExecCommand(codeToCopy, highlightDiv) {
+    const textArea = document.createElement('textArea');
+    textArea.contentEditable = 'true';
+    textArea.readOnly = 'false';
+    textArea.className = 'copyable-text-area';
+    textArea.value = codeToCopy;
+    highlightDiv.insertBefore(textArea, highlightDiv.firstChild);
+    const range = document.createRange();
+    range.selectNodeContents(textArea);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    textArea.setSelectionRange(0, 999999);
+    document.execCommand('copy');
+    highlightDiv.removeChild(textArea);
+  }
+
+  // change copy text to copied when button is copied
+  function asuCodeWasCopied(button) {
+    button.blur();
+    // eslint-disable-next-line no-param-reassign
+    button.innerText = 'Copied!';
+    // eslint-disable-next-line func-names
+    setTimeout(function () {
+      // eslint-disable-next-line no-param-reassign
+      button.innerText = 'Copy';
+    }, 2000);
+  }
+
+  // add copy button to the dom
+  function asuAddCopyButtonToDom(button, highlightDiv) {
+    highlightDiv.insertBefore(button, highlightDiv.firstChild);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'highlight-wrapper';
+    highlightDiv.parentNode.insertBefore(wrapper, highlightDiv);
+    wrapper.appendChild(highlightDiv);
+  }
+
+  document
+    .querySelectorAll('.custom-asu-code-highlight')
+    .forEach((highlightDiv) => asuCreateCopyButton(highlightDiv));
+  // END ASU CUSTOM UNITY STYLES
+}); // onload end
+
+// //////////////////////////////////////////////////////////////////////////// //
+// Custom Global Nav Tray                                                       //
+// //////////////////////////////////////////////////////////////////////////// //
+// https://community.canvaslms.com/thread/23242-global-nav-custom-tray
+
+(() => {
+  $(document).ready(() => {
+    // Set tray title here  //
+    const title = 'accessibility';
+
+    // Options are above for convenience, continue if you like //
+    const tidle = title.replace(/\s/g, '_').toLowerCase();
+
+    const menu = $('#menu');
+    const icon = $('<li>', {
+      id: `global_nav_${tidle}_menu`,
+      class: 'ic-app-header__menu-list-item',
+      html:
+        `<a id="global_nav_${tidle}_link" href="https://accessibility.asu.edu/canvas-student-accessibility" class="ic-app-header__menu-list-link" target="_blank">` +
+        `<div class="menu-item-icon-container" role="presentation"><span class="svg-${tidle}-holder">` +
+        '<svg version="1.1" class="ic-icon-svg" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 26 26" style="enable-background:new 0 0 26 26;" xml:space="preserve"><g><path class="st0" d="M20.5,8.5c-4.5,1.7-9.8,1.7-15,0L4.6,8.3v3.2L5,11.7l0.1,0.1c1.7,0.5,3.2,0.9,4.6,1.1v9.7h3.4v-5h0.5v5h3.3 v-9.8c1.3-0.2,2.6-0.5,4.1-1.1l0.4-0.2V8.3L20.5,8.5z M15.5,11.6v9.7h-0.7v-5h-3.1v5H11v-9.7l-0.6,0c-1.3-0.2-2.7-0.5-4.4-1V10 c2.5,0.7,4.9,1.1,7.2,1.1c2.3,0,4.6-0.4,6.9-1.1v0.8c-1.2,0.4-2.5,0.7-4,0.9H15.5z"/><path class="st0" d="M13.2,9.1c1.6,0,2.8-1.3,2.8-2.9s-1.3-2.9-2.8-2.9c-1.6,0-2.9,1.3-2.9,2.9S11.6,9.1,13.2,9.1z M13.2,7.9 c-0.9,0-1.6-0.6-1.6-1.6c0-0.9,0.7-1.5,1.6-1.5c0.8,0,1.5,0.6,1.5,1.5C14.7,7.2,14.1,7.9,13.2,7.9z"/><path class="st0" d="M13,0.6C6.2,0.6,0.6,6.2,0.6,13S6.2,25.3,13,25.3S25.3,19.8,25.3,13S19.8,0.6,13,0.6z M13,24.1 c-6.1,0-11-5-11-11.1s5-11,11-11s11.1,5,11.1,11S19.1,24.1,13,24.1z"/></g></svg>' +
+        `</span></div>` +
+        `<div class="menu-item__text">Accessibility</div></a>`,
+    });
+
+    icon.find(`.svg-${tidle}-holder`).load(() => {
+      const svg = $(this).find('svg')[0];
+      const svgId = `global_nav_${tidle}_svg`;
+      svg.setAttribute('id', svgId);
+      svg.setAttribute(
+        'class',
+        'ic-icon-svg menu-item__icon ic-icon-svg--apps svg-icon-help ic-icon-svg-custom-tray'
+      );
+      $(`#${svgId}`).find('path').removeAttr('fill');
+    });
+
+    menu.append(icon);
+  });
+})();
+// //////////////////////////////////////////////////////////////////////////// //
+”ò¿Ÿ„  …          ¶K\Z      auSubAccountIds    I}Çª      asuGA      kﬂùT      GoogleAnalyticsObject      Ñu2      push   DC      createElement      XFZ      getElementsByTagName   ú∑»õ      src    •_œ”
+      parentNode     ÂL…2      insertBefore	   ‚b„ˆ	      gtm.start
+      uÙ.      getTime    II∑P      event      ^©~Ñ      gtm.js     øKRt	      dataLayer      ß¸¬µ      &l=    H*–œ+      https://www.googletagmanager.com/gtm.js?id=    ¯2áâ      window     ∏OÄ      document   ÚÔSf      GTM-PQVJ7SL    «=      ALLY_CFG   ¸-…      baseUrl    î;)–      https://prod.ally.ac   ù3#      clientId   ˝∑ÈI	      getScript      qi°g      /integration/canvas/ally.js    ‡õáÛ      asuInactiveHidden      éK∑	      setCookie#      ËIkí	      getCookie%      ﬂY„	      substring&      ⁄Eú¡      indexOf'    ∂3Ê•      asuParseUrlForIdUrlSearchTerm*      Ì=à      paginateAPI,    ·ËL•      processCallback-    ∏å;&      endingCallback1     6ó(Å      data3   ™¯}∞      newCount9   ˛+      klContentWrappersArray2:    ©úá      #course_home_content;   tê8¿      #wiki_page_show<    A∏µ      #discussion_topic=      ,ÈK      #course_syllabus>   ÓlW      #assignment_show?   ]‚ß¢      #wiki_page_revisions@   Æ∂*      #people-optionsA    wN@	      #gradebook_wrapperB     _c\ª      klPageContentCheck2C    ∂’5ª      klContentWrapperElement2G   
+}N      childrenS   Ω~-$      klAfterContentLoaded2T      µÛo´      newCheckCountY      ª©`X      href[   +∫ù˛      ENVf    0+QA      locationh   $¸
+|      asuInactivePeoplePagei      µR.∫      asuAddAlertForManualAddsj   …æE      asuCheckInactiveCookien     \Œ6ﬁ      asuToggleInactiveUserss      rO      addEventListenert   ü™‚X      clicku      d<˚
+       asuCheckForNewlyDeactivatedUsers~   uù~ﬂ'      asuInjectHideShowButtonSelectorPositionÄ    çÕ”O      beforeÅ     }Hcﬁ      asuFixAlternatingRowStylingÇ    êBÄ∏      asuAttachInactiveClickHandlerÉ      Y˝Yy      acceptButtonHitCountÑ   »fÌ      currentCourseIdÖ    ÆVbc      coursesÜ    ⁄Øt‚
+      courseCodeá     „ˇﬂ      /api/v1/courses/ê   ”ÛwW      asuCreateAlertDiví      ˇÂ¿      getElementsByClassNameú     ˙U~      buttonû     ≠	év	      innerText¶      LÉ      asuRemoveDivElementß    ‹B-      append©     *N∑∆      removeø     <;J      asuTableEvenHoverHandler√   ı-–√      asuTableOddHoverHandler≈    z‚L      asuToggleInactiveHandler…   ‘„X      htmlÃ   “E      titleŒ      R•YM      asuWhatAccountAreWeIn—      =¨«“      accounts“   Ç∑@d      asuFilterTermsBasedOnLocation”      peÚu      asuCurrentAccountId‘    I8ˆû      asuSubAccount÷      mù&˜      auSubAccounts◊      Ø«—/      asuDisableTermFilter‹   vÁã°	      termArray‚      	º|s      currentSpanValË     l™EQ      asuShowHideTermAccountHandler˜      Vh „      asuEnableTermFilter˚    —yx      currentOptVal¸      ?6Ú      asuShowHideTermCourseHandler	  ©8GR	      prependTo
+     ò3$á      #wrapper  ı¢ÄU      asuCheckGlobalNav     SˆLg      asuCustomHelpMenuDetails  ÑAf      asuUpdateGlobalNav,    cçj%      addCourseSettingLinks-     ëap&      basePathA  ÈFå      trustedOriginsB    >Ì”
+      https://credid.asu.eduC    =®Ä;      originD    Ö89      subjectE   <=ı’      messageDataF   tìüç!      lti.refreshAfterSubmission.credIdG     MΩT      reloadH    2áU)      loadI  <oíí      elementsWithUrlJ   #•ç      querySelectorAllK  _<~ã      [src],[href]L  ≤cT      regexM     Ã–;–      mediaplusUrlN  •∏mC      &userId=O  ÷[›W      current_user_idP   IÆ-      https://www.google-analytics.com/analytics.jsQ     ˆma      asu_gaR    C˘íÒ      USER_IDS   :	∂#      createT    M"zÜ      UA-42798992-21U    z¡≤S      autoV  jÈº      userIdW    ¸,∏      sendX  2§±h      pageviewY  ˜üå=      #custom_urlZ   
+s)˝      #custom_new_tab[   &⁄õ      val\   â»‰›      https://asu.instructure.com]   ÍÈTÏ      https://canvas.asu.edu^    –®4O      pathname_  úﬂï˙      courseNavLinks`    Ü|ë      #section-tabs > li > ag    lÁaé      endsWithh  —ôKö      settingsi  GMDÏ      courseSectionsj    Ûà      users_countk   º‘.f      sectionElementl    	ô¿	      _section_m     ‰}      nextElementSiblingn    rÈ7      nextElementSiblingChildreno    aéú      asuHeaderListItemsp    H#ùl{     <li><a class="Button" href="http://www.asu.edu/">ASU Home</a></li><li><a class="Button" href="https://my.asu.edu/">My ASU</a></li><li><a class="Button" href="http://www.asu.edu/colleges/">Colleges &amp; Schools</a></li><li><a class="Button" href="http://www.asu.edu/map/">Map &amp; Locations</a></li><li><a class="Button" href="http://www.asu.edu/contactasu/">Contact Us</a></li>q   D‹·ë      .mobile-header-hamburgert  ºu◊      submissionsu   œÇ…Â      speed_graderv  ∂`      #speedgrader_iframew   ’\Áy      headlessx  2ã]d      <div class="asuHeaderPadding"></div><div id="custom-asu-header-links"><ul id="custom-asu-header-ul">y  Ë5à‘      </ul></div>z   hö%—[      div.public_options > input#course_indexed, div.public_options > label[for="course_indexed"]{   ^@ße2      div.public_options > input[name="course[indexed]"]|    ±à–Î      a.submit_error_link}   (eõs      If you reached this page through a link in your course, please reach out to your instructor and include this URL ( ~   â≥‡®€       ), as well as what you were attempting to do when you encountered the error.<br><br>If this link was not in a course, or you need assistance with other issues, please reach out to the ASU Help Center at 1-855-278-5080.   Ø69#'      a.submit_error_link, #submit_error_formÄ   ¬èÈÑ      accÅ   Éˆº      custom-asu-card-headerÇ    ~õ›&      panelÉ     s≠,Ù      custom-asu-card-bodyÑ  EﬁS      onclickã   ,˙      asuSetClassì   üC¨h      .custom-asu-nav-itemô  EäÅ$      asuCreateCopyButtonö   ∆Y’∞      highlightDivû  |lù*      asuCopyCodeToClipboardü    êŸ      asuAddCopyButtonToDom™     £ú$      asuCopyCodeBlockExecCommand´   (      asuCodeWasCopiedæ  kH–¯      .custom-asu-code-highlightø    ¢Ñ
+      ready¿     ø≠œq      accessibility¡     X:      tidle¬     RâDo      toLowerCase√   ™€q      menuƒ  õ\∂U      #menu≈     VXﬂJ      icon∆  "'      <li>«  ì•A      global_nav_»   §—Q@      _menu…     ∑W      ic-app-header__menu-list-item      u¸       <a id="global_nav_À    ﬁ§.      _link" href="https://accessibility.asu.edu/canvas-student-accessibility" class="ic-app-header__menu-list-link" target="_blank">Ã   ¬sƒaK      <div class="menu-item-icon-container" role="presentation"><span class="svg-Õ   J6’	      -holder">Œ     mwsÃ     <svg version="1.1" class="ic-icon-svg" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 26 26" style="enable-background:new 0 0 26 26;" xml:space="preserve"><g><path class="st0" d="M20.5,8.5c-4.5,1.7-9.8,1.7-15,0L4.6,8.3v3.2L5,11.7l0.1,0.1c1.7,0.5,3.2,0.9,4.6,1.1v9.7h3.4v-5h0.5v5h3.3 v-9.8c1.3-0.2,2.6-0.5,4.1-1.1l0.4-0.2V8.3L20.5,8.5z M15.5,11.6v9.7h-0.7v-5h-3.1v5H11v-9.7l-0.6,0c-1.3-0.2-2.7-0.5-4.4-1V10 c2.5,0.7,4.9,1.1,7.2,1.1c2.3,0,4.6-0.4,6.9-1.1v0.8c-1.2,0.4-2.5,0.7-4,0.9H15.5z"/><path class="st0" d="M13.2,9.1c1.6,0,2.8-1.3,2.8-2.9s-1.3-2.9-2.8-2.9c-1.6,0-2.9,1.3-2.9,2.9S11.6,9.1,13.2,9.1z M13.2,7.9 c-0.9,0-1.6-0.6-1.6-1.6c0-0.9,0.7-1.5,1.6-1.5c0.8,0,1.5,0.6,1.5,1.5C14.7,7.2,14.1,7.9,13.2,7.9z"/><path class="st0" d="M13,0.6C6.2,0.6,0.6,6.2,0.6,13S6.2,25.3,13,25.3S25.3,19.8,25.3,13S19.8,0.6,13,0.6z M13,24.1 c-6.1,0-11-5-11-11.1s5-11,11-11s11.1,5,11.1,11S19.1,24.1,13,24.1z"/></g></svg>œ  ®ƒl      </span></div>–     wàmR4      <div class="menu-item__text">Accessibility</div></a>—  ‹TAó      .svg-“     rº72      -holderÿ   ç{√r      asuWhatAccountAreWeIn<Ÿ    ﬁö√      asuGA/i[r]<⁄   ¿;ê      courses\/\d+\/settings€    ¬.@ù      accounts\/\d+‹     óÂb      asuWhatAccountAreWeIn</<›  5Ñ„ø      courses\/\d+\/detailsﬁ     QGw      addCourseSettingLinks/<ﬂ   “µø=$      mediaplus.*\.asu\.edu\/lti\/embedded‡  ˇU‰      accounts\/\d+($|\/$|\/?\?)·    fà–      acc[i].onclick‚    ®Ê1      \s    M   á     M             Ô%,â                                                                                                   #                                   6                  :                                  ;      
+                                                                                                                                                           <                                   J                 K                      ≥Oåc         j  ê¶  ê  ê#  ê˜  êÅ  êB  ê~  ê◊  êi  ê*  ên  êê  ê ê  ê'  êÇ  êh  êS  êu  ê ê“  ê, ê  É     9  Œ               i `s  o  g  r `a  m                                w  d  s  l  i            f  j  U              ÿ `          Ñ                                           A E                ã Pô Pû P™ P´ Pü P          I L PR o PÄ PÇ P          _           i          i            k           m           n          i           i               ç             M                                           Ã  ¡ P√ ≈ Ø¬0∞⁄     €     ⁄     ›     ﬂ     ‡     ⁄     ‚    IÙ$KEÆ˙ö 
+   Ç          ∏    Ä¯ˇ    ∫    Ä¯ˇ    ª    Ä¯ˇ    º    Ä¯ˇ    Ω    Ä¯ˇ    æ    Ä¯ˇ    ø    Ä¯ˇ    ¿    Ä¯ˇ    ¡    Ä¯ˇ    ¬    Ä¯ˇ             6   Ä¯ˇ    H        :      ;      <      =      >      ?      @      A     
+      	           V         ç A   …  á&’™é!´!   <   4   ^Aw$  “                       ∞±   ﬂº  J   ù   ó   ﬂº  J   ó   ±   ﬂæ   ú#   ó   ﬂæ   ·J   ‰¡   µ   s ó   öt   ó   º  J   ö6   ó	   º  ·J      ª   J   J   1&&.L   ﬂô1   ó   º  ·J      ª   J   J   1&&.L   ﬂó   “• &`• 	`ö #
+ˇˇˇ˙Pí `í@	`£@	`ü@PÄÄÄ4         —   ˇˇˇˇ   Ä   vtÄ   K                        ‹Õ   ﬂ¡   ¡   K¡   ¡   KJ   ù   ó   ﬂh    ó   L   ·J   ‰æ   w ﬂ•F`º ˇˇˇ˚PDPÄÄÄ6   ƒ   ›”%«ƒ   u                          l   ·J   ‰ª   J   J   s ú*   ó   ﬂl   ·J   ‰ª   J   J   s ó   ö   ó    ¢ó   ª   ·J   ‰m	   w ﬂ• `ˇˇˇ˚P/ˇˇˇ˚Pì@`1,F`ˇˇˇ˚P4,PÄÄ;      Pa|@  ô                      $–   ∞±   ±  ﬂm   Œ  ﬂm   Œ  ﬂm   Œ  ﬂm   Œ  ﬂm   Œ  ﬂm   Œ  ﬂª   ·J	   ‰
+   s ±   ﬂl   ≥   ﬂæ   ·J   ‰m   w ﬂª    w  ﬂª    ª   ª            w ﬂª   J   ±  ﬂª             9   æ  <   w ﬂª          w ﬂª       s J   ú    ó   ﬂª        s J   ó#   ö˛  ó$   ª       s ·J!   ‰s  ·J"   ‰ª       s ·J!   ‰s  ·J#   ‰$   	s s %   ù]   ó2   ﬂª       s ·J!   ‰s  ·J"   ‰ª       s ·J!   ‰s  ·J#   ‰$   	s s &   ó?   ö@  ó@   ª   J'   ·J(   ‰s  ·J"   ‰ª   J'   ·J(   ‰s  ·J#   ‰$   	s s ª       s ·J!   ‰s  ·J"   ‰ª       s ·J!   ‰s  ·J#   ‰$   	s s ö•   óZ   ª   ª   J'   ·J(   ‰s  ·J"   ‰ª   J'   ·J(   ‰s  ·J#   ‰$   	s s ª       s ·J!   ‰s  ·J"   ‰ª       s ·J!   ‰s  ·J#   ‰$   	s s &L'   ﬂóu   ª   J'   J)   ·J"   ‰s *   öQ   ó|   ∞±  ﬂª   ·J	   ‰,   s ±  ﬂæ  ö   óÄ   æ  ·J   ‰m-   w ﬂóÉ   “óÉ   ª   J'   J)   ·J.   ‰/   s öâ  óâ   ∞±  ﬂª   ·J1   ‰2   s ±  ﬂæ  ú   óç   ﬂæ  J   óè   ö;  óê   ∞±  ﬂ±  ﬂòê   æ  æ  J   ö  óì   ∞±  ﬂæ  æ  K±  ﬂæ  J5   ·J6   ‰7   s öø   óò   ∞±  ﬂæ  e·J9   ±  ﬂﬂæ  ú   óö   ﬂæ  J:   óõ   ö{   óú   ∞±  ﬂæ  J:   ±  ﬂæ  J   ö    ó†   æ  K·J<   ‰w  ﬂô0   ó£   æ  J   ö   ó¶   æ  K·J<   ‰w  ﬂó©   “ó©   “ó©   “æ  0(Õ  ﬂôÊ˛ˇˇó´   “ó´   “ó´   l=   ·J>   ‰ª   J'   J?   s ù)   ó±   ﬂl@   ·J>   ‰ª   J'   J?   s ó∂   ö   ó∑   ªA    w  ﬂóπ   B   ≥   ﬂª    C   s ·JD   ‰mE   w ﬂª   J'   J?   ·J#   ‰F   s ˇúx   ó≈   ﬂª   J'   J?   ·J#   ‰G   s ˇúL   óÃ   ﬂª    H   s J   ú,   ó—   ﬂª   J'   J?   ·J#   ‰I   s ˇó◊   ö5   óÿ   ª    J   ¡   1&K   &s ·JL   ‰M   w ﬂóﬁ   ª    N   s ·J<   ‰w  ﬂª    O   s ·J!   ‰P   w ﬂª    Q   s ·JR   ‰S   ª   J'   1&T   &w ﬂª    U   s ·J<   ‰w  ﬂ∞±  ﬂ±  ﬂòÚ   æ  ªW   J   ö]   óˆ   ª    ªW   æ  Ks J   ö$   ó˝   ªX    ªW   æ  Kw ﬂô   ó  æ  0(Õ  ﬂôìˇˇˇó  “ª   ·J1   ‰Y   s ≥   ﬂª   ·J1   ‰Z   s ≥   ﬂ∞±  ﬂ±  ﬂò	  æ  ¡   J   ö/   ó  ¡   æ  Km\   L]   ﬂæ  0(Õ  ﬂô¡ˇˇˇó  “ª    ^   s ·JD   ‰m_   w ﬂª   ·J	   ‰`   s ·J   ‰ma   w ﬂ—• —@`ë 	P(`K`ˇˇˇ¯PD`J`&%EPD`/`ï +%I 	PD#`ê PD&`P† Pô0( `P*
+P*\
+Pë Pˇˇˇ‹Pë [*
+P*\
+Pë Pˇˇˇ‹Pï03 	`ë P*í Pë PˇˇˇÿP#	[*P*\
+Pë Pˇˇˇ‹P@<	`ë P*í Pë PˇˇˇÿP#[*P*[
+Pë PˇˇˇﬂPOI`ô Pì FK`ë 	P(	`.`ˇˇˇ¯POs`õ PFu`ë 	PHw	`© `fî & `N{`ï P&*`ë@~`ß 3&0` `ñ `P.`ï `Pñ@x2`°0Ä  ç `"ˇˇˇ˚P.#õ ˇˇˇ˚Pí ` `+`P
+#ˇˇˇ˙P4Ä  ü `õ Pë õPë [ï õPï `&gMÄ  •P U `EÄ  ´P P$`P7P `P*ví@Ä  ±P `P
+,P `fï 	`
+ˇˇˇˇPî `ˇˇˇˇP$`JÄ  ∑8`ñ@Ä  ¬`ë 	P)`ë 	P `fï `ï@Ä  ≈#`ñ@Ä  ‚`P
+ˇˇˇ˙PDÄ 0`,U*ˇˇˇ¯PPÄ   –        ì  ˇˇˇˇ+   i  G       0   ›        3   %  1     4   O  Ò      8   Ö  µ      ;   √  q      V   G  Ñ       [   ˇ  V              1           S  r            D      (  AÖß(  »                        Ω  Œ   ﬂΩ Œ   ﬂ¡   ¡   L   ﬂ¡   ¡   ¡   ¡   Kù   ó   ﬂm   ó   Nﬂ¡   ¡   Kª   Ä„  Å  *L   ﬂº ·J   ‰º s Ã ﬂº ·J   ‰º s KÃ ﬂº L   ﬂº º L   ﬂº J	   ·J
+   ‰º º w ﬂ•í@`ê@`¢@ZJ`
+ˇˇˇÚP
+ˇˇˇÎPI`J`,`ˇˇˇPP#   \  ⁄Ê^2L  Ÿ   	                   Ω  Œ   ﬂl   ·J   ‰ª   J   J   s öX   ó   ∞±   ﬂª    ª   J   J      s ±   ﬂª	   ·J
+   ‰   æ   1&m   w ﬂ“ôY   ó   l   ·J   ‰ª   J   J   s ö1   ó   ¡    ª    ª   J   J      s w ﬂó   •)`ˇˇˇ˚PF`&E:PH`ˇˇˇ÷PO`ˇˇˇ˚PM`î ˇˇˇ‚PˇˇˇˇP9PÄÄ\     1   I   ˇˇˇˇJ   X   e›Æ≤X                             ª    ª   s ·J   ‰m   w ﬂ• `ˇˇˇˇP
+ˇˇˇ˙P4!PÄÄ:      ku@   ®                       ∞±   ±  ﬂh      i    ±   ﬂæ   ·J   ‰º  J   s ù   ó   ﬂº  J   J   ó	   ö   ó
+    §“•ó
+   º  J   J   ±  ﬂæ     ö   ó   ª   J	   ·J
+   ‰w  ﬂó   “• *`î@	`ˇˇˇ˜Pù@`AH`í@	`î `ë PJPÄÄ          ß   ˇˇˇˇ    `          K   ®  ?Õ¶[ò           
+              –   ∞±   ±  ±  ﬂ   ±   ﬂæ   ·J   ‰l      s ·J   ‰s  ≥   ﬂª       s ±  ﬂª    	   9
+      ¡   1&   &<      <      ¡   1&   &   ¡   1&   &&   &   &   &<   s ±  ﬂæ  ·J   ‰   ¡   1&   &s ·J   ‰m   w ﬂæ  ·J   ‰æ  w ﬂ—• ì@`J`
+ˇˇˇ¯P
+PI`P(`
+%í * í 	N&	&	KPH`
+ˇˇˇÛP
+"ˇˇˇ˚PD`ˇˇˇ˘P%PÄ®          ˇˇˇˇ   ú  Êﬂqå           	             ∞±   ±  ±  ﬂº  º º  º Kù   ó   ﬂh    ó   Nﬂº  º K·J   ‰9   ª   Ä„  Å  ·J   ‰s  <      <   w ﬂº ·J	   ‰º s K±   ﬂº ·J
+   ‰º s ±  ﬂº    ö   ó      º 1&ô   ó      ó   ±  ﬂæ  L   ﬂæ     º 1&æ  1&L   ﬂæ   J   ·J   ‰æ  æ   w ﬂ“• N`§ `
+%
+P
+P(JPD`
+ˇˇˇÎP*`
+ˇˇˇÚP(`ò û `+`	6,`ê ˇˇˇPPÄú           ˇˇˇˇ    p  3/ëp  ’                         ⁄   :   ≤   ﬂm    ª   ª            w ﬂª   :    L!   ﬂª"   ·J#   ‰ª!   J$   1%   &w ﬂ ≤&   ﬂ:(   ≤'   ﬂ≤)   ﬂª+   Äm,   „  Å ≤*   ﬂª   ·J-   ‰.   m/   w ﬂª   ·J-   ‰0   m1   w ﬂm2    w  ﬂ•E`K!`F.î ˇˇˇ˜P41`ê07` ë ˇˇˇÛP4:GÄ  ñ!`KÄ O`GÄ ˇ`	ˇˇˇÙ9Ä 0`%5Ä AAÄ 0P4Ä D`ë  ˇˇˇÁPDÄ `FÄ †PPÄ3ıÿ  pi  r  
+  p  p	  p                ,  -  W     p                                T      C    p  p  p  p  p  p        Ü    pT    p            T    p   p"  p$  p        ÿ  (  p,  p        ‚  +  p*  p-  p    ˚  '  p)  p    ‹  &  p.  p    ”  ‘  ÷  2  p     3  4  p5  p8  p9  p    - 7  pC  pö ú  G  pú  <  p=  p>  p?  p@  pA  pB  pD  pE  pF  pH  pI  p                                                                                L o Ä Ç ã ô û ™ ´ ü L  p¡ K  p   `  p  p  p  p  p  p  p  p  p  p  p  p  p  p  p  p!  p%  p/  p0  p1  p3  p6  p      @  p    ·        @  $          9    @É  Œ  π  #  ps  \  :  pH ;  pJ  p  `    pÅ  l                 `q      `  `    @Å  
+  	              ê                `   P    f  Y    `'  Ö  $  Œ   á  $  p  P—    `  P    f  Y    PŒ    7  p  `	  `B   C 1  D F   f  G 
+  `  `@  pB  pD  pE  pF  pH  p  J K   PΩ   <  p,     ·  P Q [  O S T U   @V W X $  Y H  Z [ %  &  /  \ ] f     ^ Ö    `` =  pg h   `í  j   `  `û    l   `m G    `©    P  Y    P“  p q t  >  pt u v w x y 	 
+ z { 0  | Ä  } ~    `9  B  Å É   `?  pÑ ì A  pæ I  p  `  `  Y  ◊  N   [  O   `$    ø K  p  `  `¿ ÿ    P_  ¬ $  ƒ ∆   @« » ç … A     À Ã Õ Œ œ – …  ∞   — “ H L  pß  ˇXÑÅ   3              ¥              ø      Ÿ       ¬              !              ` 	         #     ` 	         '     ` 	    	   *     ` 	                 !                !                  !        B     ` 	                 !          S     ` 	       h     ` 	               !                  !                  !                  !          j     ` 	       i     `  	                 !                  !  "      ê     ` 	                 !          ¶     ` 	 $      u     ` 	                 !          ~     ` 	         n     ` 	 )      Å     ` 	         ø                 √         +      Ç     ` 	         ≈         ’      ÿ     !         ‹   `!	 >      “     ` 	 :              !  0              !                  !  6              !  5              !  1              !          Ë                 ¸                         !          ◊     ` 	         ˜     ` 	 D          ` 	                 !  H          ` 	                                       ‰   
+   ,       J      ﬁ   `!	                 !                  !  Ó              ! ˘   b           ! [  	           !               `!	               `!	         ·   ` 	         ã   ` 	               `!	 O      ô   ` 	                 !          û   `  	         ™   ` 	 R      ´   ` 	                            ü   ` 	               `!	 d             ! i             !               `!	 ùH©¿      è¶      è¶                Ä$  o    o  
+                  –    –                  ë  .  ë  .  "               õ  Ä  â  Ä  =               î  ‘	  Ç  ‘	  D               ¸	  ò  ÷	  ò  U   '          Ä O  ·  ;  ·  f               
+  ≈  
+  ≈  q              t  ò  t  ò  x               f  à  f  à  Å             Ä  f  ˝  f  £               ¶  Y  ¶  Y  À                Ü     h     ‘               2   ¡(     ¡(  ˛               ^!  ¶&  ^!  ¶&    1            Ö!  2"  Ö!  2"                 A%  Å%  A%  Å%     %             Ç(  ∫(  Ç(  ∫(  >               ‚(  *  √(  *  D              DÄf*  -  ?*  -  R  (             +  [+  +  [+  Z  5            Æ,  -  Æ,  -  f              9-  /2  -  /2  o              .  K.  .  K.  t               M2  ê2  12  ê2  é              ª2  5  í2  5  ì  *            »4  5  »4  5  ©               K5  S8  5  S8  Ø  1            t8  ö9  U8  ö9  ¬               ¿9  /<  ú9  /<  –  %            …:  D;  ®:  D;  ◊  &           ≠;  (<  ç;  (<  ﬂ  %           W<  9?  1<  9?  Ë  '            £<  5?  Ç<  5?  È  H           Äe?  ´A  e?  ´A     +            É@  Û@  É@  Û@    1           ’A  ;U  ØA  ;U    '            C  ˘T  C  ˘T               µD  ÂE  µD  ÂE  &  )            (E  €E  (E  €E  (  '           
+F  •T  
+F  •T  1  #            LG  –N  LG  –N  5  9           {G  ¬N  {G  ¬N  6             +I  êN  I  êN  ?  @            R  ÓS  ﬂQ  ÓS  w  2             ˇT  4U  ˇT  4U  é              ZU  ÎX  =U  ÎX  î               	Y  6Y  ÌX  6Y  µ             Ä#Z  	\  	Z  	\  ª              €Z   \  €Z   \  ¬              &\  \g  \  \g  Ã             b^  ù^  Y^  ù^  Ÿ              `  Y`  `  Y`  ‰              Ëg  n   g  n                ñh  n  ñh  n  
+               ñj  ‡j  ñj  ‡j                 k  ¯m  k  ¯m    *            2n  ˛o  2n  ˛o  3            Ä,p  {ú  ,p  {ú  E  !             q  ≥r  q  ≥r  K              z    z    í              ‰Ö  aÜ  ‰Ö  aÜ  ‹  '            ›ç  \ê  ‘ç  \ê                yê  Ûê  eê  Ûê                 Lë  í  Lë  í  '  #          Äpí  ,î  Tí  ,î  1              ∏ì  ì  ∏ì  ì  8  &           @ÄUî  ñ  0î  ñ  >  (            ßñ  ¸ò  Éñ  ¸ò  O  '          ÄOô  oö  6ô  oö  a              ö  cö  ˚ô  cö  f               ±ö  ’õ  ìö  ’õ  m  !            #ú  Vú  #ú  Vú  w             œù  7¶  œù  7¶  Ä              Îù  3¶  Îù  3¶  Å               ƒ§  ¶  ƒ§  ¶  î  ,           5°›E,HOÁ∫“Ã      h`ßïh`ßïHZÕ≤Ñ¡‘   ë    O^partitionKey=%28https%2Casu.edu%29,:https://instructure-uploads.s3.amazonaws.com/account_72360000000000001/attachments/105350162/canvas-prod.js necko:classified 1 strongly-framed 1 security-info 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 request-method GET response-head HTTP/1.1 200 OK
+x-amz-id-2: 1jCIHg1kVq95RBcyAICViFIQUzSb0tiR9nwC3zcyNL2oN4FXSccRSOZ2aHQsomHfxsUH1Rji17A=
+x-amz-request-id: 49XF68KP1F0Z7PZY
+Date: Fri, 30 May 2025 17:18:55 GMT
+Last-Modified: Thu, 20 Mar 2025 20:15:19 GMT
+ETag: "2bc640c61447cf6a07365560294e3873"
+x-amz-server-side-encryption: AES256
+Cache-Control: Cache-Control:max-age=473354280, public
+Expires: Tue, 20 Mar 2040 20:15:18 GMT
+x-amz-version-id: aM.AK1qd2no0yZ5WxLLev3NFq.Eru.L8
+Accept-Ranges: bytes
+Content-Type: application/x-javascript
+Content-Length: 42639
+Server: AmazonS3
+ original-response-headers x-amz-id-2: 1jCIHg1kVq95RBcyAICViFIQUzSb0tiR9nwC3zcyNL2oN4FXSccRSOZ2aHQsomHfxsUH1Rji17A=
+x-amz-request-id: 49XF68KP1F0Z7PZY
+Date: Fri, 30 May 2025 17:18:55 GMT
+Last-Modified: Thu, 20 Mar 2025 20:15:19 GMT
+ETag: "2bc640c61447cf6a07365560294e3873"
+x-amz-server-side-encryption: AES256
+Cache-Control: Cache-Control:max-age=473354280, public
+Expires: Tue, 20 Mar 2040 20:15:18 GMT
+x-amz-version-id: aM.AK1qd2no0yZ5WxLLev3NFq.Eru.L8
+Accept-Ranges: bytes
+Content-Type: application/x-javascript
+Content-Length: 42639
+Server: AmazonS3
+ ctid 2 uncompressed-len 0 net-response-time-onstart 410 net-response-time-onstop 418 alt-data 1;42639,javascript/moz-script-bytecode-20250325080210-8l alt-data-from-child 1  £æ

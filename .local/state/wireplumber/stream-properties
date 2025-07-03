@@ -1,0 +1,4 @@
+[stream-properties]
+Output/Audio:application.name:eSpeak={"volume":1.000000, "channelMap":["MONO"], "channelVolumes":[1.000000], "mute":false}
+Output/Audio:application.name:speech-dispatcher-dummy={"volume":1.000000, "mute":false, "channelVolumes":[1.000000], "channelMap":["MONO"]}
+Output/Audio:media.role:Notification={"mute":false, "volume":1.000000, "channelVolumes":[1.000000, 1.000000], "channelMap":["FL", "FR"]}
